@@ -18,5 +18,5 @@ python lila.py <t>
 ```
 replace `<t>` with the Term set cardinality (e.g. the number of actions)
 
-> python ontobot.py 5
+> python lila.py 5
 
