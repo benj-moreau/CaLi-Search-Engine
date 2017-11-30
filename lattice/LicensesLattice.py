@@ -1,5 +1,5 @@
 import licenses.ConsolidatedLicenses as ConsolidatedLicenses
-import Lattice
+from Lattice import Lattice
 
 
 class LicensesLattice(Lattice):

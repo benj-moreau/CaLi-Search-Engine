@@ -1,5 +1,6 @@
 import argparse
 import utils.LicensesPowersetGenerator as PowersetGenerator
+from lattice.LicensesLattice import LicensesLattice
 
 
 def main():
@@ -7,9 +8,10 @@ def main():
     parser.add_argument('terms_number', metavar='t', type=int, nargs='+',
                         help='Terms set cardinality (e.g. number of actions)')
     args = parser.parse_args()
-    terms_number = args.terms_number[0]
-    PowersetGenerator.generate(['a', 'b', 'c'])
-    print terms_number
+    Terms = ['a', 'b', 'c']
+    powerset = PowersetGenerator.generate(Terms)
+    lila = LicensesLattice(powerset)
+    lila.generate_lattice()
 
 
 if __name__ == "__main__":
