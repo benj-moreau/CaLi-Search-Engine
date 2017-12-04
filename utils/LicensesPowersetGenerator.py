@@ -1,25 +1,35 @@
+from licenses.ConsolidatedLicense import ConsolidatedLicense
 from itertools import permutations
 
 
-def generate(Terms):
+def generate_licenses(Terms):
+    permutations = _generate(Terms)
+    powerset = []
+    for ind, permut in enumerate(permutations):
+        label = "L{}".format(ind)
+        powerset.append(ConsolidatedLicense(label, permut[0], permut[1], permut[2]))
+    return powerset
+
+
+def _generate(Terms):
     result = []
-    for p in partition(Terms):
+    for p in _partition(Terms):
         if (len(p) < 4):
             while (len(p) < 3):
                 p.append([])
-            for perm in permutations(p):
-                if perm not in result:
-                    result.append(perm)
+            for ind, permut in enumerate(permutations(p)):
+                if permut not in result:
+                    result.append(permut)
     return result
 
 
-def partition(collection):
+def _partition(collection):
     if len(collection) == 1:
         yield [collection]
         return
 
     first = collection[0]
-    for smaller in partition(collection[1:]):
+    for smaller in _partition(collection[1:]):
         # insert `first` in each of the subpartition's subsets
         for n, subset in enumerate(smaller):
             yield smaller[:n] + [[first] + subset] + smaller[n+1:]

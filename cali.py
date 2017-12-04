@@ -5,11 +5,11 @@ from lattice.LicensesLattice import LicensesLattice
 
 def main():
     parser = argparse.ArgumentParser(prog='cali', description='Experiments with lattice.')
-    parser.add_argument('terms_number', metavar='t', type=int, nargs='+',
-                        help='Terms set cardinality (e.g. number of actions)')
+    parser.add_argument('filename', metavar='f', type=str, nargs='+',
+                        help='json file containing terms')
     args = parser.parse_args()
     Terms = ['a', 'b', 'c']
-    powerset = PowersetGenerator.generate(Terms)
+    powerset = PowersetGenerator.generate_licenses(Terms)
     cali = LicensesLattice(powerset)
     cali.generate_lattice()
 
