@@ -1,6 +1,4 @@
-import licenses.ConsolidatedLicenses as ConsolidatedLicenses
-
-from itertools import permutations, combinations
+from itertools import permutations
 
 
 def generate(Terms):

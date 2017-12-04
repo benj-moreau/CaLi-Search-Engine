@@ -1,4 +1,4 @@
-# LiLa
+# CaLi
 Experiments with lattice.
 
 # Prelude
@@ -11,12 +11,11 @@ pip install -r requirements.txt
 ```
 
 # Run the demo
-Navigate to lila folder and execute:
+Navigate to cali folder and execute:
 
 ```bash
-python lila.py <t>
+python cali.py <t>
 ```
 replace `<t>` with the Term set cardinality (e.g. the number of actions)
 
 > python lila.py 5
-
