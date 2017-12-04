@@ -18,4 +18,4 @@ python cali.py <t>
 ```
 replace `<t>` with the Term set cardinality (e.g. the number of actions)
 
-> python lila.py 5
+> python cali.py 5
