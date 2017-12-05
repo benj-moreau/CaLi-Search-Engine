@@ -3,15 +3,17 @@ from Lattice import Lattice
 
 
 class LicensesLattice(Lattice):
-    def prune_filter(self, CL):
-        return CL.is_consolidated(self.terms)
+    def prune_filter(self, cl):
+        return True
+        return cl.is_consolidated(self.terms)
 
-    def combination_function(self, CL1, CL2):
-        label = CL1.label | CL2.label
-        permissions = CL1.permissions & CL2.permissions
-        obligations = CL1.obligations | CL2.obligations
-        prohibitions = CL1.prohibitions | CL2.prohibitions
-        return ConsolidatedLicense(label, permissions, obligations, prohibitions)
+    def combination_function(self, cl1, cl2):
+        label = cl1.label | cl2.label
+        permissions = cl1.permissions & cl2.permissions
+        obligations = cl1.obligations | cl2.obligations
+        prohibitions = cl1.prohibitions | cl2.prohibitions
+        parents = [cl1, cl2]
+        return ConsolidatedLicense(label, permissions, obligations, prohibitions, parents)
 
     def generate_lattice(self):
         print self.layer_nb_nodes(0)
@@ -27,3 +29,11 @@ class LicensesLattice(Lattice):
                         new_layer.add(new_license)
             self.set += (new_layer,)
             print len(new_layer)
+
+    def repr(self):
+        self.repr_rec(list(self.set[self.height()-1])[0])
+
+    def repr_rec(self, cl):
+        print cl
+        for license in cl.parents:
+            self.repr_rec(license)

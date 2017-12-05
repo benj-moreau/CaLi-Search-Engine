@@ -7,7 +7,7 @@ def generate_licenses(Terms):
     powerset = []
     for ind, permut in enumerate(permutations):
         label = "L{}".format(ind)
-        powerset.append(ConsolidatedLicense(frozenset([label]), set(permut[0]), set(permut[1]), set(permut[2])))
+        powerset.append(ConsolidatedLicense(frozenset([label]), set(permut[0]), set(permut[1]), set(permut[2]), []))
     return powerset
 
 

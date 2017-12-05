@@ -1,10 +1,11 @@
 class ConsolidatedLicense(object):
 
-    def __init__(self, label, permissions, obligations, prohibitions):
+    def __init__(self, label, permissions, obligations, prohibitions, parents):
         self.label = label
         self.permissions = permissions
         self.obligations = obligations
         self.prohibitions = prohibitions
+        self.parents = parents
 
     def is_consolidated(self, Terms):
         if self.permissions.isdisjoint(self.obligations):
