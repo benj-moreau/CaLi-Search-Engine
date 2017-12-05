@@ -8,9 +8,9 @@ def main():
     parser.add_argument('filename', metavar='f', type=str, nargs='+',
                         help='json file containing terms')
     args = parser.parse_args()
-    Terms = ['a', 'b', 'c']
-    powerset = PowersetGenerator.generate_licenses(Terms)
-    cali = LicensesLattice(powerset)
+    terms = ['a', 'b', 'c']
+    powerset = PowersetGenerator.generate_licenses(terms)
+    cali = LicensesLattice(terms, powerset)
     cali.generate_lattice()
 
 
