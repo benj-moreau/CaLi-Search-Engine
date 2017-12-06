@@ -12,7 +12,11 @@ def main():
     powerset = PowersetGenerator.generate_licenses(terms)
     cali = LicensesLattice(terms, powerset)
     cali.generate_lattice()
-    cali.repr()
+    for v in cali.licenses_hash_table:
+        print len(cali.licenses_hash_table[v])
+        print cali.licenses_hash_table[v][0].repr_terms()
+        for lic in cali.licenses_hash_table[v]:
+            print lic
 
 
 if __name__ == "__main__":
