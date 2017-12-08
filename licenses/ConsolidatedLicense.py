@@ -22,9 +22,9 @@ class ConsolidatedLicense(object):
 
     def repr_terms(self):
         """Using Permissions, obligations, prohibitions to print licence."""
-        return "Permissions:{}, Obligations:{}, Prohibitions:{}".format(self.permissions,
-                                                                        self.obligations,
-                                                                        self.prohibitions)
+        return "Permissions:{}, Obligations:{}, Prohibitions:{}".format(list(self.permissions),
+                                                                        list(self.obligations),
+                                                                        list(self.prohibitions))
 
     def __eq__(self, other):
         """Using label to differentiate licenses in lattice' sets."""

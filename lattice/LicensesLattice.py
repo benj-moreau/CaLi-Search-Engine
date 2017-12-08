@@ -1,5 +1,6 @@
 from licenses.ConsolidatedLicense import ConsolidatedLicense
 from Lattice import Lattice
+from utils.TimerDecorator import fn_timer
 
 
 class LicensesLattice(Lattice):
@@ -20,13 +21,24 @@ class LicensesLattice(Lattice):
         permissions = cl1.permissions & cl2.permissions
         obligations = cl1.obligations | cl2.obligations
         prohibitions = cl1.prohibitions | cl2.prohibitions
+        obligations, prohibitions = self.combination_priority(obligations, prohibitions, "obligation")
         parents = [cl1, cl2]
         new_cl = ConsolidatedLicense(label, permissions, obligations, prohibitions, parents, [])
         cl1.childs.append(new_cl)
         cl2.childs.append(new_cl)
         return new_cl
 
+    def combination_priority(self, obligations, prohibitions, priority="obligation"):
+        if priority == "obligation":
+            prohibitions = prohibitions - obligations
+        else:
+            obligations = obligations - prohibitions
+        return obligations, prohibitions
+
+    @fn_timer
     def generate_lattice(self):
+        print self.layer_nb_nodes(0)
+        print self.layer_nb_nodes(1)
         while self.layer_nb_nodes(self.height()-1) > 1:
             new_layer = set([])
             previous_layer = list(self.set[self.height()-1])
@@ -38,6 +50,7 @@ class LicensesLattice(Lattice):
                         new_layer.add(new_license)
                         self._add_in_hash_table(new_license)
             self.set += (new_layer,)
+            print self.layer_nb_nodes(self.height()-1)
 
     def repr(self):
         self.repr_rec(list(self.set[self.height()-1])[0])
