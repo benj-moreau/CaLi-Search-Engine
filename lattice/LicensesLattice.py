@@ -12,7 +12,7 @@ class LicensesLattice(Lattice):
             self._add_in_hash_table(license)
 
     def prune_filter(self, cl):
-        return cl.is_consolidated(self.terms)
+        # return cl.is_consolidated(self.terms)
         return True
 
     def combination_function(self, cl1, cl2):

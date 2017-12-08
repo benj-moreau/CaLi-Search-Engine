@@ -1,6 +1,7 @@
 import argparse
 import utils.LicensesPowersetGenerator as PowersetGenerator
 from lattice.LicensesLattice import LicensesLattice
+import utils.PlotlyLattice as Plotly
 
 
 def main():
@@ -12,11 +13,7 @@ def main():
     powerset = PowersetGenerator.generate_licenses(terms)
     cali = LicensesLattice(terms, powerset)
     cali.generate_lattice()
-    for v in cali.licenses_hash_table:
-        print len(cali.licenses_hash_table[v])
-        print cali.licenses_hash_table[v][0].repr_terms()
-        for lic in cali.licenses_hash_table[v]:
-            print lic
+    Plotly.draw(cali, 0.1, 0.1)
 
 
 if __name__ == "__main__":
