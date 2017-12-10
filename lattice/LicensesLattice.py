@@ -1,6 +1,7 @@
 from licenses.ConsolidatedLicense import ConsolidatedLicense
 from Lattice import Lattice
 from utils.TimerDecorator import fn_timer
+from itertools import combinations
 
 
 class LicensesLattice(Lattice):
@@ -41,14 +42,12 @@ class LicensesLattice(Lattice):
         print self.layer_nb_nodes(1)
         while self.layer_nb_nodes(self.height()-1) > 1:
             new_layer = set()
-            previous_layer = list(self.set[self.height()-1])
-            for i in range(len(previous_layer)-1):
-                for j in range(i+1, len(previous_layer)):
-                    new_license = self.combination_function(previous_layer[i],
-                                                            previous_layer[j])
-                    if self.prune_filter(new_license):
-                        new_layer.add(new_license)
-                        self._add_in_hash_table(new_license)
+            previous_layer = self.set[self.height()-1]
+            for couple in combinations(previous_layer, 2):
+                new_license = self.combination_function(couple[0], couple[1])
+                if self.prune_filter(new_license):
+                    new_layer.add(new_license)
+                    self._add_in_hash_table(new_license)
             self.set += (new_layer,)
             print self.layer_nb_nodes(self.height()-1)
 
