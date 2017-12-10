@@ -1,3 +1,8 @@
+def hash_label(label):
+    """Using label to spot equivalent licenses."""
+    return hash(label)
+
+
 class ConsolidatedLicense(object):
 
     def __init__(self, label, permissions, obligations, prohibitions, parents, childs):
@@ -32,7 +37,7 @@ class ConsolidatedLicense(object):
 
     def __hash__(self):
         """Using label to differentiate licenses in lattice' sets."""
-        return hash(self.label)
+        return hash_label(self.label)
 
     def __repr__(self):
         """Using label to print licenses."""

@@ -1,4 +1,4 @@
-from licenses.ConsolidatedLicense import ConsolidatedLicense
+from licenses.ConsolidatedLicense import ConsolidatedLicense, hash_label
 from Lattice import Lattice
 from utils.TimerDecorator import fn_timer
 from itertools import combinations
@@ -17,8 +17,7 @@ class LicensesLattice(Lattice):
         # return cl.is_consolidated(self.terms)
         return True
 
-    def combination_function(self, cl1, cl2):
-        label = cl1.label | cl2.label
+    def combination_function(self, cl1, cl2, label):
         permissions = cl1.permissions & cl2.permissions
         obligations = cl1.obligations | cl2.obligations
         prohibitions = cl1.prohibitions | cl2.prohibitions
@@ -41,13 +40,24 @@ class LicensesLattice(Lattice):
         print self.layer_nb_nodes(0)
         print self.layer_nb_nodes(1)
         while self.layer_nb_nodes(self.height()-1) > 1:
+            new_layer_dict = {}
             new_layer = set()
             previous_layer = self.set[self.height()-1]
             for couple in combinations(previous_layer, 2):
-                new_license = self.combination_function(couple[0], couple[1])
-                if self.prune_filter(new_license):
-                    new_layer.add(new_license)
-                    self._add_in_hash_table(new_license)
+                cl1 = couple[0]
+                cl2 = couple[1]
+                combination_label = cl1.label | cl2.label
+                hashed_label = hash_label(combination_label)
+                if hashed_label in new_layer_dict:
+                    # this licence is already created by combining other licenses
+                    new_layer_dict[hashed_label].parents.append((cl1, cl2))
+                else:
+                    new_license = self.combination_function(cl1, cl2, combination_label)
+                    if self.prune_filter(new_license):
+                        new_layer_dict[hashed_label] = new_license
+                        self._add_in_hash_table(new_license)
+            for licence in new_layer_dict.values():
+                new_layer.add(licence)
             self.set += (new_layer,)
             print self.layer_nb_nodes(self.height()-1)
 
