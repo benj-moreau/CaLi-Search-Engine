@@ -16,7 +16,7 @@ def generate_coordinate(lattice, width, height):
     Ze = []
 
     label = ['{}']
-    terms = ['limitum']
+    terms = ['infimum']
     group = [1]
     y_node_space = height / lattice.height()
     biggest_layer = 0
@@ -71,7 +71,7 @@ def draw(lattice, width=1000, height=600):
          title="CaLi",
          width=width,
          height=height,
-         showlegend=True,
+         showlegend=False,
          scene=Scene(
             xaxis=XAxis(axis),
             yaxis=YAxis(axis),

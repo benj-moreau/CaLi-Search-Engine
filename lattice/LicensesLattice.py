@@ -22,7 +22,7 @@ class LicensesLattice(Lattice):
         obligations = cl1.obligations | cl2.obligations
         prohibitions = cl1.prohibitions | cl2.prohibitions
         obligations, prohibitions = self.combination_priority(obligations, prohibitions, "obligation")
-        parents = [cl1, cl2]
+        parents = [(cl1, cl2)]
         new_cl = ConsolidatedLicense(label, permissions, obligations, prohibitions, parents, [])
         cl1.childs.append(new_cl)
         cl2.childs.append(new_cl)
@@ -40,7 +40,7 @@ class LicensesLattice(Lattice):
         print self.layer_nb_nodes(0)
         print self.layer_nb_nodes(1)
         while self.layer_nb_nodes(self.height()-1) > 1:
-            new_layer = set([])
+            new_layer = set()
             previous_layer = list(self.set[self.height()-1])
             for i in range(len(previous_layer)-1):
                 for j in range(i+1, len(previous_layer)):
