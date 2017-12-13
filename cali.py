@@ -2,7 +2,7 @@ import argparse
 import json
 import utils.LicensesPowersetGenerator as PowersetGenerator
 from lattice.LicensesLattice import LicensesLattice
-import utils.PlotlyLattice as Plotly
+from utils.LatticeCypher import generate_cypher_files
 
 
 def main():
@@ -15,7 +15,7 @@ def main():
     powerset = PowersetGenerator.generate_minimal_licences_set(terms)
     cali = LicensesLattice(terms, powerset)
     cali.generate_lattice()
-    Plotly.draw(cali)
+    generate_cypher_files(cali)
 
 
 if __name__ == "__main__":

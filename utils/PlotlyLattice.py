@@ -18,11 +18,9 @@ def generate_coordinate(lattice, width, height):
     label = ['{}']
     terms = ['infimum']
     group = [1]
-    y_node_space = height / lattice.height()
-    biggest_layer = 0
-    for layer in lattice.set[1:]:
-        biggest_layer = max(biggest_layer, len(layer))
-    x_node_space = width / biggest_layer
+
+    x_node_space = width / 15
+    y_node_space = x_node_space / 10
     for layer in lattice.set[1:]:
         y -= y_node_space
         margin = width - (width - len(layer) * x_node_space) / 2

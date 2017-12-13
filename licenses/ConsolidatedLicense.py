@@ -20,6 +20,21 @@ class ConsolidatedLicense(object):
                     return (self.permissions | self.obligations | self.prohibitions) == terms
         return False
 
+    def get_label(self):
+        label = ""
+        for l in self.label:
+            label = "{}{}".format(label, l)
+        return label
+
+    def get_permissions(self):
+        return [str(item) for item in self.permissions]
+
+    def get_obligations(self):
+        return [str(item) for item in self.obligations]
+
+    def get_prohibitions(self):
+        return [str(item) for item in self.prohibitions]
+
     @property
     def hash(self):
         """Using Permissions, obligations, prohibitions to spot equivalent licenses."""
