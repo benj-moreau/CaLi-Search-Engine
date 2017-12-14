@@ -2,14 +2,15 @@ LICENSE_CREATION = 'CREATE({}:License{{label:"{}", permissions:"{}", obligations
 RELATION_CREATION = 'CREATE(({})-[:Preserves]->({}))'
 
 
-def generate_cypher_files(lattice):
-    with open('licenses.cypher', 'w') as licenses_file:
-        with open('licenses_relations.cypher', 'w') as relations_file:
-            for level_number, level in enumerate(lattice.set):
-                for license in level:
-                    licenses_file.write("{}\n".format(_generate_node(license, level_number)))
-                    for child in license.childs:
-                        relations_file.write("{}\n".format(_generate_relation(license, child, level_number)))
+def generate_cypher_files(lattice, nb_terms):
+    with open('licenses_A{}.cypher'.format(nb_terms), 'w') as licenses_file:
+        relations = ""
+        for level_number, level in enumerate(lattice.set):
+            for license in level:
+                licenses_file.write("{}\n".format(_generate_node(license, level_number)))
+                for child in license.childs:
+                    relations = "{}{}\n".format(relations, _generate_relation(license, child, level_number))
+        licenses_file.write(relations)
 
 
 def _generate_node(license, level_number):

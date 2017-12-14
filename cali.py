@@ -15,7 +15,7 @@ def main():
     powerset = PowersetGenerator.generate_minimal_licences_set(terms)
     cali = LicensesLattice(terms, powerset)
     cali.generate_lattice()
-    generate_cypher_files(cali)
+    generate_cypher_files(cali, len(terms))
 
 
 if __name__ == "__main__":

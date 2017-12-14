@@ -1,10 +1,11 @@
 from licenses.ConsolidatedLicense import ConsolidatedLicense, hash_label
 from Lattice import Lattice
 from utils.TimerDecorator import fn_timer
+from threading import Thread
 from itertools import combinations
 
 
-class LicensesLattice(Lattice):
+class LicensesLattice(Lattice, Thread):
 
     def __init__(self, terms, powerset):
         super(LicensesLattice, self).__init__(terms, powerset)
