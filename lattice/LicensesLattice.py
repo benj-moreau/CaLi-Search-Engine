@@ -38,10 +38,10 @@ class LicensesLattice(Lattice, Thread):
 
     @fn_timer
     def generate_lattice(self):
-        print self.layer_nb_nodes(0)
-        print self.layer_nb_nodes(1)
+        print ("layer 0 is ok")
+        print ("layer 1 is ok")
         while self.layer_nb_nodes(self.height()-1) > 1:
-            new_layer_dict = {}
+            label_dict = {}
             new_layer = set()
             previous_layer = self.set[self.height()-1]
             for couple in combinations(previous_layer, 2):
@@ -49,18 +49,23 @@ class LicensesLattice(Lattice, Thread):
                 cl2 = couple[1]
                 combination_label = cl1.label | cl2.label
                 hashed_label = hash_label(combination_label)
-                if hashed_label in new_layer_dict:
+                if hashed_label in label_dict:
                     # this licence is already created by combining other licenses
-                    new_layer_dict[hashed_label].parents.append((cl1, cl2))
+                    label_dict[hashed_label].parents.append((cl1, cl2))
+                    cl1.childs.append(label_dict[hashed_label])
+                    cl2.childs.append(label_dict[hashed_label])
+                    if label_dict[hashed_label] in previous_layer:
+                        # The license have to 1 layer up
+                        new_layer.add(label_dict[hashed_label])
+                        self.set[self.height()-1].remove(label_dict[hashed_label])
                 else:
                     new_license = self.combination_function(cl1, cl2, combination_label)
                     if self.prune_filter(new_license):
-                        new_layer_dict[hashed_label] = new_license
+                        label_dict[hashed_label] = new_license
                         self._add_in_hash_table(new_license)
-            for licence in new_layer_dict.values():
-                new_layer.add(licence)
+                        new_layer.add(new_license)
             self.set += (new_layer,)
-            print self.layer_nb_nodes(self.height()-1)
+            print ("layer {} is ok".format(self.height()-1))
 
     def repr(self):
         self.repr_rec(list(self.set[self.height()-1])[0])
@@ -69,6 +74,12 @@ class LicensesLattice(Lattice, Thread):
         print cl
         for license in cl.parents:
             self.repr_rec(license)
+
+    def nb_parents(self):
+        for level_n, level in enumerate(self.set):
+            print "-------level:{}".format(level_n)
+            for license in level:
+                print "{} -> {}".format(len(license.parents), license.get)
 
     def _add_in_hash_table(self, license):
         if license.hash in self.licenses_hash_table:

@@ -1,7 +1,7 @@
 class Lattice(object):
 
-    def __init__(self, terms, powerset):
-        self.set = (set([]), set(powerset))
+    def __init__(self, terms, level_1):
+        self.set = (set([]), set(level_1))
         self.terms = set(terms)
 
     def combination_function(self, element1, element2):
