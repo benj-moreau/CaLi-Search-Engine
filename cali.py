@@ -14,7 +14,7 @@ def main():
     terms = result["terms"]
     level_1 = FirstLeveLGen.generate_minimal_licences_set(terms)
     cali = LicensesLattice(terms, level_1)
-    cali.generate_lattice()
+    cali.generate_lattice(3)
     generate_cypher_files(cali, len(terms))
 
 
