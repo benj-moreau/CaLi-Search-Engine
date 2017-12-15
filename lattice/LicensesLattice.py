@@ -22,23 +22,19 @@ class LicenseCombinor(Thread):
             cl1 = couple[0]
             cl2 = couple[1]
             combined_label = cl1.label | cl2.label
-            print len(combined_label)
-            hashed_label = hash_label(combined_label)
-            if hashed_label in label_dict:
-                # this licence is already created by combining other licenses
-                label_dict[hashed_label].parents.append((cl1, cl2))
-                cl1.childs.append(label_dict[hashed_label])
-                cl2.childs.append(label_dict[hashed_label])
-                if label_dict[hashed_label] in self.lattice.set[self.lattice.height()-1]:
-                    # The license have to 1 layer up
-                    self.new_layer.add(label_dict[hashed_label])
-                    self.lattice.set[self.lattice.height()-1].remove(label_dict[hashed_label])
-            else:
-                new_license = self.combination_function(cl1, cl2, combined_label)
-                if self.prune_filter(new_license):
-                    label_dict[hashed_label] = new_license
-                    self.add_in_hash_table(new_license)
-                    self.new_layer.add(new_license)
+            if len(combined_label) < self.lattice.height()+1:
+                hashed_label = hash_label(combined_label)
+                if hashed_label in label_dict:
+                    # this licence is already created by combining other licenses
+                    label_dict[hashed_label].parents.append((cl1, cl2))
+                    cl1.childs.append(label_dict[hashed_label])
+                    cl2.childs.append(label_dict[hashed_label])
+                else:
+                    new_license = self.combination_function(cl1, cl2, combined_label)
+                    if self.prune_filter(new_license):
+                        label_dict[hashed_label] = new_license
+                        self.add_in_hash_table(new_license)
+                        self.new_layer.add(new_license)
 
     def combination_function(self, cl1, cl2, label):
         permissions = cl1.permissions & cl2.permissions
