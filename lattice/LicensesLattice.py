@@ -94,7 +94,7 @@ class LicensesLattice(Lattice):
                 licenses_hash_table[license.hash] = [license]
 
     @fn_timer
-    def generate_lattice(self, nb_threads):
+    def generate_lattice(self, nb_couples_per_threads):
         print ("layer 0 is ok")
         for license in self.set[self.height()-1]:
             if license.hash in self.licenses_hash_table:
@@ -106,7 +106,10 @@ class LicensesLattice(Lattice):
             previous_layer = self.set[self.height()-1]
             couples = combinations(previous_layer, 2)
             nb_couples = (len(previous_layer)) * (len(previous_layer)-1) / 2
-            chunk_size = nb_couples / nb_threads
+            chunk_size = nb_couples_per_threads
+            nb_threads = nb_couples / chunk_size
+            if nb_threads < 1:
+                nb_threads = 1
             rest = nb_couples % nb_threads
             threads = []
             try:

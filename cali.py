@@ -9,14 +9,14 @@ def main():
     parser = argparse.ArgumentParser(prog='cali', description='Experiments with lattice.')
     parser.add_argument('filename', metavar='Filename', type=str, nargs='+',
                         help='json file containing terms')
-    parser.add_argument('nb_threads', metavar='Threads', type=int, nargs='+',
-                        help='the number of maximum threads to handle licenses combination')
+    parser.add_argument('couples_per_thread', metavar='Couples', type=int, nargs='+',
+                        help='the number of license couple a thread should combine')
     args = parser.parse_args()
     result = json.load(open(args.filename[0]))
     terms = result["terms"]
     level_1 = FirstLeveLGen.generate_minimal_licences_set(terms)
     cali = LicensesLattice(terms, level_1)
-    cali.generate_lattice(args.nb_threads[0])
+    cali.generate_lattice(args.couples_per_thread[0])
     generate_cypher_files(cali, len(terms))
 
 
