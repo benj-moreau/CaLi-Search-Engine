@@ -16,7 +16,7 @@ Then, install dependencies
 pip install -r requirements.txt
 ```
 
-# Run the dev server
+# Run the server
 Navigate to cali folder and execute:
 
 ```bash
