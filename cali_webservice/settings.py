@@ -77,10 +77,19 @@ WSGI_APPLICATION = 'cali_webservice.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'db', 'test_database.sqlite3')
     }
 }
 
+DATABASE_ROUTERS = ['neo4django.utils.Neo4djangoIntegrationRouter']
+
+NEO4J_DATABASES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 7474,
+        'ENDPOINT': '/db/data'
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
