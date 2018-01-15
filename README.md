@@ -10,12 +10,9 @@ install dependencies
 pip install -r requirements.txt
 ```
 
-# Run the demo
+# Run the dev server
 Navigate to cali folder and execute:
 
 ```bash
-python cali.py <t>
+python manage.py runserver
 ```
-replace `<t>` with the Term set cardinality (e.g. the number of actions)
-
-> python cali.py 5
