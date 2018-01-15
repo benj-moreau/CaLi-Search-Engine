@@ -2,6 +2,8 @@
 Experiments with lattice.
 
 # Prelude
+Installation in a `virtualenv` is advised.
+
 Assuming you already have `python` and `pip`
 
 install neo4j (recommended community-3.4.0)
