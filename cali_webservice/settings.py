@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'lg==)_!4x4e7*o-_k7845do7o4-f#^o%%=7ds50p*%xb@p9)d#'
+SECRET_KEY = '^fuws(ib2zqs^k3-bi&=x%1ufcz4m37+lmnmxi05i)^gh4akvl'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,7 +37,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_neomodel',
 )
+
+NEOMODEL_NEO4J_BOLT_URL = os.environ.get('NEO4J_BOLT_URL', 'bolt://neo4j:test@localhost:7687')
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -77,19 +80,17 @@ WSGI_APPLICATION = 'cali_webservice.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db', 'test_database.sqlite3')
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
-DATABASE_ROUTERS = ['neo4django.utils.Neo4djangoIntegrationRouter']
-
-NEO4J_DATABASES = {
-    'default': {
-        'HOST': 'localhost',
-        'PORT': 7474,
-        'ENDPOINT': '/db/data'
-    }
-}
+NEOMODEL_NEO4J_BOLT_URL = 'bolt://neo4j:admin@127.0.0.1:7687'
+NEOMODEL_SIGNALS = True
+NEOMODEL_FORCE_TIMEZONE = False
+NEOMODEL_MAX_POOL_SIZE = 50
+# IN DEBUG MODE
+NEOMODEL_ENCRYPTED_CONNECTION = False
+AUTO_INSTALL_LABELS = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
