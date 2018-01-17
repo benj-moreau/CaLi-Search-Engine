@@ -1,6 +1,7 @@
 from neomodel import StructuredNode, ArrayProperty, StringProperty, RelationshipFrom, RelationshipTo
 
 
+# DAO. Objects used to access data in neo4j database
 class DatasetModel(StructuredNode):
     label = StringProperty(index=True)
     description = StringProperty()

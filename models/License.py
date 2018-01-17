@@ -1,17 +1,19 @@
-def hash_label(label):
-    """Using label to spot equivalent licenses."""
-    return hash(label)
+class License(object):
 
-
-class ConsolidatedLicense(object):
-
-    def __init__(self, label, permissions, obligations, prohibitions, parents, childs):
-        self.label = label
+    def __init__(self, labels, permissions, obligations, prohibitions, parents, childs, datasets):
+        self.labels = labels
+        if not isinstance(permissions, set):
+            raise TypeError("permissions must be of type: set")
         self.permissions = permissions
+        if not isinstance(obligations, set):
+            raise TypeError("obligations must be of type: set")
         self.obligations = obligations
+        if not isinstance(prohibitions, set):
+            raise TypeError("prohibitions must be of type: set")
         self.prohibitions = prohibitions
         self.parents = parents
         self.childs = childs
+        self.datasets = datasets
 
     def is_consolidated(self, terms):
         if self.permissions.isdisjoint(self.obligations):
@@ -20,25 +22,25 @@ class ConsolidatedLicense(object):
                     return (self.permissions | self.obligations | self.prohibitions) == terms
         return False
 
-    def get_label(self):
-        label = ""
-        for l in self.label:
-            label = "{}{}".format(label, l)
-        return label
+    def get_labels(self):
+        return [str(label) for label in self.labels]
 
     def get_permissions(self):
-        return [str(item) for item in self.permissions]
+        return [str(permission) for permission in self.permissions]
 
     def get_obligations(self):
-        return [str(item) for item in self.obligations]
+        return [str(obligation) for obligation in self.obligations]
 
     def get_prohibitions(self):
-        return [str(item) for item in self.prohibitions]
+        return [str(prohibitions) for prohibitions in self.prohibitions]
 
-    @property
-    def hash(self):
-        """Using Permissions, obligations, prohibitions to spot equivalent licenses."""
-        return hash("{}".format([self.permissions, self.obligations, self.prohibitions]))
+    def to_json(self):
+        return {
+            'labels': self.get_labels(),
+            'permissions': self.get_permissions(),
+            'obligations': self.get_obligations(),
+            'prohibitions': self.get_prohibitions(),
+        }
 
     def repr_terms(self):
         """Using Permissions, obligations, prohibitions to print licence."""
@@ -48,18 +50,15 @@ class ConsolidatedLicense(object):
 
     def __eq__(self, other):
         """Using label to differentiate licenses in lattice' sets."""
-        return isinstance(other, ConsolidatedLicense) and self.label == other.label
+        return isinstance(other, License) and self.label == other.label
 
     def __hash__(self):
         """Using label to differentiate licenses in lattice' sets."""
-        return hash_label(self.label)
+        return hash("{}".format([self.permissions, self.obligations, self.prohibitions]))
 
     def __repr__(self):
         """Using label to print licenses."""
-        label = []
-        for lic in self.label:
-            label.append(lic)
-        return "{}".format(label)
+        return "{}".format(self.get_labels)
 
     def __str__(self):
         """Using label to print licenses."""
