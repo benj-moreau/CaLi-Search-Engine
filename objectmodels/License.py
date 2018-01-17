@@ -1,6 +1,6 @@
 class License(object):
 
-    def __init__(self, labels, permissions, obligations, prohibitions, parents, childs, datasets):
+    def __init__(self, labels, permissions, obligations, prohibitions, datasets):
         self.labels = labels
         if not isinstance(permissions, set):
             raise TypeError("permissions must be of type: set")
@@ -11,8 +11,6 @@ class License(object):
         if not isinstance(prohibitions, set):
             raise TypeError("prohibitions must be of type: set")
         self.prohibitions = prohibitions
-        self.parents = parents
-        self.childs = childs
         self.datasets = datasets
 
     def is_consolidated(self, terms):
@@ -34,12 +32,16 @@ class License(object):
     def get_prohibitions(self):
         return [str(prohibitions) for prohibitions in self.prohibitions]
 
+    def get_datasets(self):
+        return self.datasets
+
     def to_json(self):
         return {
             'labels': self.get_labels(),
             'permissions': self.get_permissions(),
             'obligations': self.get_obligations(),
             'prohibitions': self.get_prohibitions(),
+            'datasets': [dataset.to_json() for dataset in self.datasets]
         }
 
     def repr_terms(self):

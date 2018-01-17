@@ -1,7 +1,7 @@
 from django.http.response import HttpResponse
 from django.views.decorators.http import require_http_methods
 
-from neomodels.models import LicenseModel
+from neomodels.models import LicenseModel, DatasetModel
 
 
 @require_http_methods(['GET'])

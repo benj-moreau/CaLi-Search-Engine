@@ -2,14 +2,6 @@ from neomodel import StructuredNode, ArrayProperty, StringProperty, Relationship
 
 
 # DAO. Objects used to access data in neo4j database
-class DatasetModel(StructuredNode):
-    label = StringProperty(index=True)
-    description = StringProperty()
-    uri = StringProperty()
-
-    license = RelationshipFrom("LicenseModel", "ApplyTo")
-
-
 class LicenseModel(StructuredNode):
     labels = ArrayProperty()
     permissions = ArrayProperty(index=True)
@@ -19,3 +11,11 @@ class LicenseModel(StructuredNode):
     childs = RelationshipTo("LicenseModel", "Composes")
     parents = RelationshipFrom("LicenseModel", "ComposedBy")
     datasets = RelationshipTo("DatasetModel", "ApplyTo")
+
+
+class DatasetModel(StructuredNode):
+    label = StringProperty(index=True)
+    description = StringProperty()
+    uri = StringProperty()
+
+    license = RelationshipFrom("LicenseModel", "ApplyTo")
