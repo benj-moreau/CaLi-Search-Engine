@@ -15,9 +15,11 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from views import api
+from views import base_api
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^api/', api.test, name='test'),
+    # url(r'^api/', include('')),
+    url(r'^api/licenses/', base_api.license_path, name='licenses_path'),
+    url(r'^api/datasets/', base_api.dataset_path, name='dataset_path'),
 ]

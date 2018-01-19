@@ -7,6 +7,7 @@ class LicenseModel(StructuredNode):
     permissions = ArrayProperty(index=True)
     obligations = ArrayProperty(index=True)
     prohibitions = ArrayProperty(index=True)
+    hashed_sets = StringProperty(unique_index=True)
 
     childs = RelationshipTo("LicenseModel", "Composes")
     parents = RelationshipFrom("LicenseModel", "ComposedBy")
@@ -16,6 +17,6 @@ class LicenseModel(StructuredNode):
 class DatasetModel(StructuredNode):
     label = StringProperty(index=True)
     description = StringProperty()
-    uri = StringProperty()
+    uri = StringProperty(unique_index=True)
 
     license = RelationshipFrom("LicenseModel", "ApplyTo")

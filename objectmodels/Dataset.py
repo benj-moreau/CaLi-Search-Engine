@@ -1,9 +1,9 @@
 class Dataset(object):
 
-    def __init__(self, label, uri, description):
-        self.label = label
-        self.uri = uri
-        self.description = description
+    def __init__(self):
+        self.label = None
+        self.uri = None
+        self.description = None
 
     def get_label(self):
         return self.label
@@ -13,6 +13,20 @@ class Dataset(object):
 
     def get_description(self):
         return self.description
+
+    def set_label(self, label):
+        self.label = label
+
+    def set_uri(self, uri):
+        self.uri = uri
+
+    def set_description(self, description):
+        self.description = description
+
+    def from_json(self, json_dataset):
+        self.set_label(json_dataset['label'])
+        self.set_uri(json_dataset['uri'])
+        self.set_description(json_dataset['description'])
 
     def to_json(self):
         return {
