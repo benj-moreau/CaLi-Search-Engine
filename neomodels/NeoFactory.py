@@ -13,5 +13,6 @@ def neoLicense(object_license):
 def neoDataset(object_dataset):
     return DatasetModel(label=object_dataset.get_label(),
                         uri=object_dataset.get_uri(),
-                        description=object_dataset.get_description()
+                        description=object_dataset.get_description(),
+                        hashed_uri=object_dataset.hash()
                         )

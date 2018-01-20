@@ -5,6 +5,9 @@ class Dataset(object):
         self.uri = None
         self.description = None
 
+    def hash(self):
+        return self.__hash__()
+
     def get_label(self):
         return self.label
 

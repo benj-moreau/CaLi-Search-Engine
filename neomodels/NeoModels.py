@@ -18,5 +18,6 @@ class DatasetModel(StructuredNode):
     label = StringProperty(index=True)
     description = StringProperty()
     uri = StringProperty(unique_index=True)
+    hashed_uri = StringProperty(unique_index=True)
 
     license = RelationshipFrom("LicenseModel", "ApplyTo")

@@ -20,6 +20,8 @@ from views import base_api
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     # url(r'^api/', include('')),
+    url(r'^api/licenses/(?P<hashed_sets>[\w_@-]+)/?$', base_api.get_license_by_hash, name='get_license_by_hash'),
     url(r'^api/licenses/', base_api.license_path, name='licenses_path'),
+    url(r'^api/datasets/(?P<hashed_uri>[\w_@-]+)/?$', base_api.get_dataset_by_hash, name='get_dataset_by_hash'),
     url(r'^api/datasets/', base_api.dataset_path, name='dataset_path'),
 ]

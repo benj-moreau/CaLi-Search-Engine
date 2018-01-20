@@ -1,6 +1,6 @@
 from django.http.response import HttpResponse
 from django.views.decorators.http import require_http_methods
-from neomodel import UniqueProperty
+from neomodel import UniqueProperty, DoesNotExist
 import json
 
 from objectmodels.Dataset import Dataset
@@ -92,6 +92,42 @@ def add_dataset(request):
             json.dumps(object_dataset.to_json()),
             content_type='application/json',
             status=409,
+        )
+        response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+def get_license_by_hash(request, hashed_sets):
+    try:
+        neo_license = LicenseModel.nodes.get(hashed_sets=hashed_sets)
+        license_object = ObjectFactory.objectLicense(neo_license)
+        response = HttpResponse(
+            json.dumps(license_object.to_json()),
+            content_type='application/json')
+        response['Access-Control-Allow-Origin'] = '*'
+    except DoesNotExist:
+        response = HttpResponse(
+            "{}",
+            content_type='application/json',
+            status=404,
+        )
+        response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+def get_dataset_by_hash(request, hashed_uri):
+    try:
+        neo_dataset = DatasetModel.nodes.get(hashed_uri=hashed_uri)
+        dataset_object = ObjectFactory.objectDataset(neo_dataset)
+        response = HttpResponse(
+            json.dumps(dataset_object.to_json()),
+            content_type='application/json')
+        response['Access-Control-Allow-Origin'] = '*'
+    except DoesNotExist:
+        response = HttpResponse(
+            "{}",
+            content_type='application/json',
+            status=404,
         )
         response['Access-Control-Allow-Origin'] = '*'
     return response

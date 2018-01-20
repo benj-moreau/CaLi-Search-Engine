@@ -67,7 +67,6 @@ class License(object):
         self.set_datasets(datasets)
 
     def to_json(self):
-        print self.get_labels()
         return {
             'labels': self.get_labels(),
             'permissions': self.get_permissions(),
