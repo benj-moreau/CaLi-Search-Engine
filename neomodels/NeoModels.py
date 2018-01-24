@@ -1,4 +1,5 @@
 from neomodel import StructuredNode, ArrayProperty, StringProperty, RelationshipFrom, RelationshipTo
+from neomodel import db
 
 
 # DAO. Objects used to access data in neo4j database
@@ -14,6 +15,11 @@ class LicenseModel(StructuredNode):
     datasets = RelationshipTo("DatasetModel", "ApplyTo")
 
 
+def license_filter_labels(label):
+    results, columns = db.cypher_query("match(license) WHERE '{}' in license.labels RETURN license".format(label))
+    return [LicenseModel().inflate(row[0]) for row in results]
+
+
 class DatasetModel(StructuredNode):
     label = StringProperty(index=True)
     description = StringProperty()
@@ -21,3 +27,8 @@ class DatasetModel(StructuredNode):
     hashed_uri = StringProperty(unique_index=True)
 
     license = RelationshipFrom("LicenseModel", "ApplyTo")
+
+
+def dataset_filter_search(query):
+    results, columns = db.cypher_query("match(dataset) WHERE dataset.label CONTAINS '{query}' OR dataset.description CONTAINS '{query}' OR dataset.uri CONTAINS '{query}' RETURN dataset".format(query=query))
+    return [DatasetModel().inflate(row[0]) for row in results]

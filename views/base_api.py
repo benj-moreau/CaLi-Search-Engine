@@ -1,12 +1,14 @@
 from django.http.response import HttpResponse
 from django.views.decorators.http import require_http_methods
+from django.db.models import Q
+
 from neomodel import UniqueProperty, DoesNotExist
 import json
 
 from objectmodels.Dataset import Dataset
 from objectmodels.License import License
 from neomodels import NeoFactory, ObjectFactory
-from neomodels.NeoModels import LicenseModel, DatasetModel
+from neomodels.NeoModels import LicenseModel, DatasetModel, license_filter_labels, dataset_filter_search
 
 
 @require_http_methods(['GET', 'POST'])
@@ -130,4 +132,55 @@ def get_dataset_by_hash(request, hashed_uri):
             status=404,
         )
         response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+@require_http_methods(['GET'])
+def get_license_search(request):
+    query = request.GET.get('query', None)
+    label = request.GET.get('label', None)
+    uri = request.GET.get('uri', None)
+    neo_licenses = LicenseModel.nodes
+    if query:
+        neo_licenses = license_filter_labels(label) | neo_licenses.filter(uri__icontains=query)
+    else:
+        if uri:
+            neo_licenses = neo_licenses.filter(uri__icontains=uri)
+        if label:
+            neo_licenses = license_filter_labels(label)
+    response_content = []
+    for neo_license in neo_licenses:
+        license_object = ObjectFactory.objectLicense(neo_license)
+        response_content.append(license_object.to_json())
+    response = HttpResponse(
+        json.dumps(response_content),
+        content_type='application/json')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+@require_http_methods(['GET'])
+def get_dataset_search(request):
+    query = request.GET.get('query', None)
+    label = request.GET.get('label', None)
+    descr = request.GET.get('descr', None)
+    uri = request.GET.get('uri', None)
+    neo_datasets = DatasetModel.nodes
+    if query:
+        neo_datasets = dataset_filter_search(query)
+    else:
+        if label:
+            neo_datasets = neo_datasets.filter(label__icontains=label)
+        if uri:
+            neo_datasets = neo_datasets.filter(uri__icontains=uri)
+        if descr:
+            neo_datasets = neo_datasets.filter(description__icontains=descr)
+    response_content = []
+    for neo_dataset in neo_datasets:
+        dataset_object = ObjectFactory.objectDataset(neo_dataset)
+        response_content.append(dataset_object.to_json())
+    response = HttpResponse(
+        json.dumps(response_content),
+        content_type='application/json')
+    response['Access-Control-Allow-Origin'] = '*'
     return response
