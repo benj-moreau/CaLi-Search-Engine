@@ -8,7 +8,7 @@ class License(object):
         self.permissions = set()
         self.obligations = set()
         self.prohibitions = set()
-        self.dataset = []
+        self.datasets = []
 
     def hash(self):
         return self.__hash__()
@@ -63,7 +63,9 @@ class License(object):
         self.set_prohibitions(set(json_license['prohibitions']))
         datasets = []
         for dataset in json_license['datasets']:
-            datasets.append(Dataset().from_json(dataset))
+            dataset_object = Dataset()
+            dataset_object.from_json(dataset)
+            datasets.append(dataset_object)
         self.set_datasets(datasets)
 
     def to_json(self):

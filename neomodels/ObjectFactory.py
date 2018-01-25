@@ -8,7 +8,10 @@ def objectLicense(neo_license):
     obj_license.set_permissions(set(neo_license.permissions))
     obj_license.set_obligations(set(neo_license.obligations))
     obj_license.set_prohibitions(set(neo_license.prohibitions))
-    obj_license.set_datasets([])
+    datasets = []
+    for neo_dataset in neo_license.datasets.all():
+        datasets.append(objectDataset(neo_dataset))
+    obj_license.set_datasets(datasets)
     return obj_license
 
 

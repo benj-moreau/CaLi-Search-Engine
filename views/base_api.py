@@ -54,23 +54,28 @@ def add_license(request):
     json_license = json.loads(request.body)
     object_license = License()
     object_license.from_json(json_license)
-    neo_license = NeoFactory.neoLicense(object_license)
-    object_license = ObjectFactory.objectLicense(neo_license)
-    try:
+    neo_license = LicenseModel.nodes.get_or_none(hashed_sets=object_license.hash())
+    if neo_license:
+        # update of labels list if needed
+        neo_license.labels = list(set(object_license.get_labels()).union(neo_license.labels))
         neo_license.save()
-        response = HttpResponse(
-            json.dumps(object_license.to_json()),
-            content_type='application/json',
-            status=201,
-        )
-        response['Access-Control-Allow-Origin'] = '*'
-    except UniqueProperty:
-        response = HttpResponse(
-            json.dumps(object_license.to_json()),
-            content_type='application/json',
-            status=409,
-        )
-        response['Access-Control-Allow-Origin'] = '*'
+    else:
+        # license does not exists in db
+        neo_license = NeoFactory.NeoLicense(object_license)
+        neo_license.save()
+    for dataset in object_license.get_datasets():
+        neo_dataset = DatasetModel.nodes.get_or_none(hashed_uri=dataset.hash())
+        if not neo_dataset:
+            neo_dataset = NeoFactory.NeoDataset(dataset)
+            neo_dataset.save()
+        neo_license.datasets.connect(neo_dataset)
+    object_license = ObjectFactory.objectLicense(neo_license)
+    response = HttpResponse(
+        json.dumps(object_license.to_json()),
+        content_type='application/json',
+        status=201,
+    )
+    response['Access-Control-Allow-Origin'] = '*'
     return response
 
 
@@ -78,7 +83,7 @@ def add_dataset(request):
     json_dataset = json.loads(request.body)
     object_dataset = Dataset()
     object_dataset.from_json(json_dataset)
-    neo_dataset = NeoFactory.neoDataset(object_dataset)
+    neo_dataset = NeoFactory.NeoDataset(object_dataset)
     object_dataset = ObjectFactory.objectDataset(neo_dataset)
     try:
         neo_dataset.save()
@@ -87,14 +92,13 @@ def add_dataset(request):
             content_type='application/json',
             status=201,
         )
-        response['Access-Control-Allow-Origin'] = '*'
     except UniqueProperty:
         response = HttpResponse(
             json.dumps(object_dataset.to_json()),
             content_type='application/json',
             status=409,
         )
-        response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Origin'] = '*'
     return response
 
 
@@ -105,14 +109,13 @@ def get_license_by_hash(request, hashed_sets):
         response = HttpResponse(
             json.dumps(license_object.to_json()),
             content_type='application/json')
-        response['Access-Control-Allow-Origin'] = '*'
     except DoesNotExist:
         response = HttpResponse(
             "{}",
             content_type='application/json',
             status=404,
         )
-        response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Origin'] = '*'
     return response
 
 
@@ -123,14 +126,13 @@ def get_dataset_by_hash(request, hashed_uri):
         response = HttpResponse(
             json.dumps(dataset_object.to_json()),
             content_type='application/json')
-        response['Access-Control-Allow-Origin'] = '*'
     except DoesNotExist:
         response = HttpResponse(
             "{}",
             content_type='application/json',
             status=404,
         )
-        response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Origin'] = '*'
     return response
 
 
@@ -193,6 +195,27 @@ def get_dataset_search(request):
     response = HttpResponse(
         json.dumps(response_content),
         content_type='application/json')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+@require_http_methods(['GET'])
+def get_datasets_of_licenses(request, hashed_sets):
+    try:
+        neo_license = LicenseModel.nodes.get(hashed_sets=hashed_sets)
+        license_datasets = []
+        for dataset in neo_license.datasets.all():
+            dataset_object = ObjectFactory.Dataset(dataset)
+            license_datasets.append(dataset_object.to_json())
+        response = HttpResponse(
+            json.dumps(license_datasets),
+            content_type='application/json')
+    except DoesNotExist:
+        response = HttpResponse(
+            "[]",
+            content_type='application/json',
+            status=404,
+        )
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
