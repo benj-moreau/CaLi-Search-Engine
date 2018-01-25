@@ -16,7 +16,7 @@ class LicenseModel(StructuredNode):
 
 
 def license_filter_labels(label):
-        results, columns = db.cypher_query("match(license) WHERE '{}' in license.labels RETURN license".format(label))
+        results, columns = db.cypher_query("match(license) WHERE any(label in license.labels WHERE label CONTAINS '{}') RETURN license".format(label))
         return [LicenseModel().inflate(row[0]) for row in results]
 
 
