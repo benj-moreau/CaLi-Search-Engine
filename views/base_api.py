@@ -1,6 +1,5 @@
 from django.http.response import HttpResponse
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q
 
 from neomodel import UniqueProperty, DoesNotExist
 import json
@@ -8,7 +7,7 @@ import json
 from objectmodels.Dataset import Dataset
 from objectmodels.License import License
 from neomodels import NeoFactory, ObjectFactory
-from neomodels.NeoModels import LicenseModel, DatasetModel, license_filter_labels, dataset_filter_search
+from neomodels.NeoModels import LicenseModel, DatasetModel, license_filter_labels, dataset_filter_search, license_filter_sets
 
 
 @require_http_methods(['GET', 'POST'])
@@ -139,15 +138,27 @@ def get_dataset_by_hash(request, hashed_uri):
 def get_license_search(request):
     query = request.GET.get('query', None)
     label = request.GET.get('label', None)
-    uri = request.GET.get('uri', None)
+    permissions = request.GET.get('permissions', None)
+    if is_empty(permissions):
+        permissions = None
+    obligations = request.GET.get('obligations', None)
+    if is_empty(obligations):
+        obligations = None
+    prohibitions = request.GET.get('prohibitions', None)
+    if is_empty(prohibitions):
+        prohibitions = None
     neo_licenses = LicenseModel.nodes
     if query:
-        neo_licenses = license_filter_labels(label) | neo_licenses.filter(uri__icontains=query)
+        neo_licenses = license_filter_labels(query)
     else:
-        if uri:
-            neo_licenses = neo_licenses.filter(uri__icontains=uri)
         if label:
             neo_licenses = license_filter_labels(label)
+        if permissions:
+            neo_licenses = license_filter_sets(permissions, 'permissions')
+        if obligations:
+            neo_licenses = license_filter_sets(obligations, 'obligations')
+        if prohibitions:
+            neo_licenses = license_filter_sets(prohibitions, 'prohibitions')
     response_content = []
     for neo_license in neo_licenses:
         license_object = ObjectFactory.objectLicense(neo_license)
@@ -184,3 +195,10 @@ def get_dataset_search(request):
         content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
+
+
+def is_empty(str_list):
+    if str_list is not None:
+        if str_list.replace(' ', '').replace('[', '').replace(']', '').split(',')[0] == '':
+            return True
+    return False
