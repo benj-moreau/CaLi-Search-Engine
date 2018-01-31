@@ -10,20 +10,25 @@ class LicenseModel(StructuredNode):
     prohibitions = ArrayProperty(index=True)
     hashed_sets = StringProperty(unique_index=True)
 
-    childs = RelationshipTo("LicenseModel", "Composes")
-    parents = RelationshipFrom("LicenseModel", "ComposedBy")
+    followings = RelationshipTo("LicenseModel", "Precedes")
+    precedings = RelationshipFrom("LicenseModel", "Precedes")
     datasets = RelationshipTo("DatasetModel", "ApplyTo")
 
 
 def license_filter_labels(label):
-        results, columns = db.cypher_query("match(license) WHERE any(label in license.labels WHERE label CONTAINS '{}') RETURN license".format(label))
-        return [LicenseModel().inflate(row[0]) for row in results]
+    results, columns = db.cypher_query("match(license:LicenseModel) WHERE any(label in license.labels WHERE label CONTAINS '{}') RETURN license".format(label))
+    return [LicenseModel().inflate(row[0]) for row in results]
 
 
 def license_filter_sets(values, set_name):
-        results, columns = db.cypher_query("match(license) WHERE all(value IN {values} WHERE value IN license.{set_name}) RETURN license"
-                                           .format(values=values, set_name=set_name))
-        return [LicenseModel().inflate(row[0]) for row in results]
+    results, columns = db.cypher_query("match(license:LicenseModel) WHERE all(value IN {values} WHERE value IN license.{set_name}) RETURN license"
+                                       .format(values=values, set_name=set_name))
+    return [LicenseModel().inflate(row[0]) for row in results]
+
+
+def get_leaf_licenses():
+    results, columns = db.cypher_query("match(license:LicenseModel) WHERE not ()-[:Precedes]->(license) RETURN license")
+    return [LicenseModel().inflate(row[0]) for row in results]
 
 
 class DatasetModel(StructuredNode):
@@ -36,6 +41,6 @@ class DatasetModel(StructuredNode):
 
 
 def dataset_filter_search(query):
-    results, columns = db.cypher_query("match(dataset) WHERE dataset.label CONTAINS '{query}' OR dataset.description CONTAINS '{query}' OR dataset.uri CONTAINS '{query}' RETURN dataset"
+    results, columns = db.cypher_query("match(dataset:DatasetModel) WHERE dataset.label CONTAINS '{query}' OR dataset.description CONTAINS '{query}' OR dataset.uri CONTAINS '{query}' RETURN dataset"
                                        .format(query=query))
     return [DatasetModel().inflate(row[0]) for row in results]

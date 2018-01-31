@@ -7,7 +7,7 @@ import json
 from objectmodels.Dataset import Dataset
 from objectmodels.License import License
 from neomodels import NeoFactory, ObjectFactory
-from neomodels.NeoModels import LicenseModel, DatasetModel, license_filter_labels, dataset_filter_search, license_filter_sets
+from neomodels.NeoModels import LicenseModel, DatasetModel, license_filter_labels, dataset_filter_search, license_filter_sets, get_leaf_licenses
 
 
 @require_http_methods(['GET', 'POST'])
@@ -46,35 +46,6 @@ def get_datasets(request):
     response = HttpResponse(
         json.dumps(response_content),
         content_type='application/json')
-    response['Access-Control-Allow-Origin'] = '*'
-    return response
-
-
-def add_license(request):
-    json_license = json.loads(request.body)
-    object_license = License()
-    object_license.from_json(json_license)
-    neo_license = LicenseModel.nodes.get_or_none(hashed_sets=object_license.hash())
-    if neo_license:
-        # update of labels list if needed
-        neo_license.labels = list(set(object_license.get_labels()).union(neo_license.labels))
-        neo_license.save()
-    else:
-        # license does not exists in db
-        neo_license = NeoFactory.NeoLicense(object_license)
-        neo_license.save()
-    for dataset in object_license.get_datasets():
-        neo_dataset = DatasetModel.nodes.get_or_none(hashed_uri=dataset.hash())
-        if not neo_dataset:
-            neo_dataset = NeoFactory.NeoDataset(dataset)
-            neo_dataset.save()
-        neo_license.datasets.connect(neo_dataset)
-    object_license = ObjectFactory.objectLicense(neo_license)
-    response = HttpResponse(
-        json.dumps(object_license.to_json()),
-        content_type='application/json',
-        status=201,
-    )
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
@@ -225,3 +196,60 @@ def is_empty(str_list):
         if str_list.replace(' ', '').replace('[', '').replace(']', '').split(',')[0] == '':
             return True
     return False
+
+
+def add_license(request):
+    json_license = json.loads(request.body)
+    object_license = License()
+    object_license.from_json(json_license)
+    neo_license = LicenseModel.nodes.get_or_none(hashed_sets=object_license.hash())
+    if neo_license:
+        # update of labels list if needed
+        neo_license.labels = list(set(object_license.get_labels()).union(neo_license.labels))
+        neo_license.save()
+    else:
+        # license does not exists in db
+        license_leaves = get_leaf_licenses()
+        neo_license = NeoFactory.NeoLicense(object_license)
+        neo_license.save()
+        for neo_license_leaf in license_leaves:
+            object_license_leaf = ObjectFactory.objectLicense(neo_license_leaf)
+            if object_license.is_preceding(object_license_leaf):
+                neo_license_leaf.precedings.connect(neo_license)
+            else:
+                update_licenses_relations_rec(neo_license, object_license, neo_license_leaf, object_license_leaf)
+    for dataset in object_license.get_datasets():
+        neo_dataset = DatasetModel.nodes.get_or_none(hashed_uri=dataset.hash())
+        if not neo_dataset:
+            neo_dataset = NeoFactory.NeoDataset(dataset)
+            neo_dataset.save()
+        neo_license.datasets.connect(neo_dataset)
+    object_license = ObjectFactory.objectLicense(neo_license)
+    response = HttpResponse(
+        json.dumps(object_license.to_json()),
+        content_type='application/json',
+        status=201,
+    )
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+def update_licenses_relations_rec(new_neo_license, new_object_license, neo_license, object_license):
+    # update precedings and followings of license recursively.
+    grand_follower = False
+    for neo_license_following in neo_license.followings:
+        object_license_following = ObjectFactory.objectLicense(neo_license_following)
+        if new_object_license.is_following(object_license_following):
+            # new license is a follower of a following
+            grand_follower = True
+        if new_object_license.is_preceding(object_license_following):
+            neo_license_following.precedings.connect(new_neo_license)
+            if new_object_license.is_following(object_license):
+                # new_license is between license and its following_license.
+                neo_license.followings.connect(new_neo_license)
+                neo_license.followings.disconnect(neo_license_following)
+        else:
+            update_licenses_relations_rec(new_neo_license, new_object_license, neo_license_following, object_license_following)
+    if not grand_follower and new_object_license.is_following(object_license):
+        # then its just the next follower of the current license
+        neo_license.followings.connect(new_neo_license)

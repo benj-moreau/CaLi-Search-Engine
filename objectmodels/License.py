@@ -13,12 +13,28 @@ class License(object):
     def hash(self):
         return self.__hash__()
 
+    def is_viable(self):
+        if not self.premission:
+            return True
+
     def is_consolidated(self, terms):
         if self.permissions.isdisjoint(self.obligations):
             if self.permissions.isdisjoint(self.prohibitions):
                 if self.obligations.isdisjoint(self.prohibitions):
                     return (self.permissions | self.obligations | self.prohibitions) == terms
         return False
+
+    def is_preceding(self, license):
+        # is self a precedor of license?
+        if self.permissions.issuperset(license.permissions):
+            if self.obligations.issubset(license.obligations):
+                if self.prohibitions.issubset(license.prohibitions):
+                    return True
+        return False
+
+    def is_following(self, license):
+        # is self a follower of license?
+        return license.is_preceding(self)
 
     def get_labels(self):
         return self.labels
