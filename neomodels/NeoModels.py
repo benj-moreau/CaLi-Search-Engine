@@ -10,9 +10,9 @@ class LicenseModel(StructuredNode):
     prohibitions = ArrayProperty(index=True)
     hashed_sets = StringProperty(unique_index=True)
 
-    followings = RelationshipTo("LicenseModel", "Precedes")
-    precedings = RelationshipFrom("LicenseModel", "Precedes")
-    datasets = RelationshipTo("DatasetModel", "ApplyTo")
+    followings = RelationshipTo("LicenseModel", "Compatible")
+    precedings = RelationshipFrom("LicenseModel", "Compatible")
+    datasets = RelationshipTo("DatasetModel", "Protects")
 
 
 def license_filter_labels(label):
@@ -27,7 +27,17 @@ def license_filter_sets(values, set_name):
 
 
 def get_leaf_licenses():
-    results, columns = db.cypher_query("match(license:LicenseModel) WHERE not ()-[:Precedes]->(license) RETURN license")
+    results, columns = db.cypher_query("match(license:LicenseModel) WHERE not ()-[:Compatible]->(license) RETURN license")
+    return [LicenseModel().inflate(row[0]) for row in results]
+
+
+def get_compatible_licenses(hashed_sets):
+    results, columns = db.cypher_query("match(license:LicenseModel {{hashed_sets:'{}'}})-[:Compatible *0..]->(comp_license:LicenseModel) RETURN distinct comp_license".format(hashed_sets))
+    return [LicenseModel().inflate(row[0]) for row in results]
+
+
+def get_compliant_licenses(hashed_sets):
+    results, columns = db.cypher_query("match(license:LicenseModel {{hashed_sets:'{}'}})<-[:Compatible *0..]-(comp_license:LicenseModel) RETURN distinct comp_license".format(hashed_sets))
     return [LicenseModel().inflate(row[0]) for row in results]
 
 
@@ -37,7 +47,7 @@ class DatasetModel(StructuredNode):
     uri = StringProperty(unique_index=True)
     hashed_uri = StringProperty(unique_index=True)
 
-    license = RelationshipFrom("LicenseModel", "ApplyTo")
+    license = RelationshipFrom("LicenseModel", "Protects")
 
 
 def dataset_filter_search(query):

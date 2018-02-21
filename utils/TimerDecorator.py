@@ -1,5 +1,9 @@
 import time
 from functools import wraps
+import logging
+
+logging.basicConfig(filename='cali_api.log', level=logging.INFO)
+LOGGER = logging.getLogger(__name__)
 
 
 def fn_timer(function):
@@ -8,8 +12,7 @@ def fn_timer(function):
         t0 = time.time()
         result = function(*args, **kwargs)
         t1 = time.time()
-        print ("Total time running %s: %s seconds" %
-               (function.func_name, str(t1-t0))
-               )
+        LOGGER.info("Total time running {}: {} seconds".format(function.func_name,
+                                                               str(t1-t0)))
         return result
     return function_timer

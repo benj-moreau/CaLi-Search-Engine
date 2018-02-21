@@ -7,7 +7,9 @@ import json
 from objectmodels.Dataset import Dataset
 from objectmodels.License import License
 from neomodels import NeoFactory, ObjectFactory
-from neomodels.NeoModels import LicenseModel, DatasetModel, license_filter_labels, dataset_filter_search, license_filter_sets, get_leaf_licenses
+from neomodels.NeoModels import LicenseModel, DatasetModel, license_filter_labels, dataset_filter_search, license_filter_sets, get_leaf_licenses, get_compliant_licenses, get_compatible_licenses
+from utils.TimerDecorator import fn_timer
+from utils import D3jsData
 
 
 @require_http_methods(['GET', 'POST'])
@@ -198,6 +200,7 @@ def is_empty(str_list):
     return False
 
 
+@fn_timer
 def add_license(request):
     json_license = json.loads(request.body)
     object_license = License()
@@ -253,3 +256,69 @@ def update_licenses_relations_rec(new_neo_license, new_object_license, neo_licen
     if not grand_follower and new_object_license.is_following(object_license):
         # then its just the next follower of the current license
         neo_license.followings.connect(new_neo_license)
+
+
+@fn_timer
+@require_http_methods(['GET'])
+def get_compatible(request, hashed_sets):
+    try:
+        neo_licenses = get_compatible_licenses(hashed_sets)
+        compatible_licenses = []
+        for neo_license in neo_licenses:
+            license_object = ObjectFactory.objectLicense(neo_license)
+            compatible_licenses.append(license_object.to_json())
+        response = HttpResponse(
+            json.dumps(compatible_licenses),
+            content_type='application/json')
+    except DoesNotExist:
+        response = HttpResponse(
+            "[]",
+            content_type='application/json',
+            status=404,
+        )
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+@fn_timer
+@require_http_methods(['GET'])
+def get_compliant(request, hashed_sets):
+    try:
+        neo_licenses = get_compliant_licenses(hashed_sets)
+        compatible_licenses = []
+        for neo_license in neo_licenses:
+            license_object = ObjectFactory.objectLicense(neo_license)
+            compatible_licenses.append(license_object.to_json())
+        response = HttpResponse(
+            json.dumps(compatible_licenses),
+            content_type='application/json')
+    except DoesNotExist:
+        response = HttpResponse(
+            "[]",
+            content_type='application/json',
+            status=404,
+        )
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+@fn_timer
+@require_http_methods(['GET'])
+def get_graph(request):
+    nodes = []
+    links = []
+    for neo_license in LicenseModel.nodes:
+        license_object = ObjectFactory.objectLicense(neo_license)
+        nodes.append(D3jsData.license_node(license_object))
+        for neo_dataset in neo_license.datasets.all():
+            dataset_object = ObjectFactory.objectDataset(neo_dataset)
+            nodes.append(D3jsData.dataset_node(dataset_object))
+            links.append(D3jsData.dataset_link(license_object, dataset_object))
+        for compatible_neo_license in neo_license.followings.all():
+            compatible_license_object = ObjectFactory.objectLicense(compatible_neo_license)
+            links.append(D3jsData.compatible_link(license_object, compatible_license_object))
+    response = HttpResponse(
+        json.dumps(D3jsData.graph(nodes, links)),
+        content_type='application/json')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
