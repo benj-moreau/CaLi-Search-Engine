@@ -13,21 +13,21 @@ Including another URLconf
     1. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import include, url
-from django.contrib import admin
 
-from views import base_api
+from views import base_api, search_engine
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
     # url(r'^api/', include('')),
-    url(r'^api/licenses/graph', base_api.get_graph, name='get_graph'),
-    url(r'^api/licenses/(?P<hashed_sets>[\w_@-]+)/compatible?$', base_api.get_compatible, name='get_compatible'),
-    url(r'^api/licenses/(?P<hashed_sets>[\w_@-]+)/compliant?$', base_api.get_compliant, name='get_compliant'),
-    url(r'^api/licenses/(?P<hashed_sets>[\w_@-]+)/datasets?$', base_api.get_datasets_of_licenses, name='get_datasets_of_licenses'),
+    url(r'^api/licenses/graph/?$', base_api.get_graph, name='get_graph'),
+    url(r'^api/licenses/(?P<hashed_sets>[\w_@-]+)/compatible/?$', base_api.get_compatible, name='get_compatible'),
+    url(r'^api/licenses/(?P<hashed_sets>[\w_@-]+)/compliant/?$', base_api.get_compliant, name='get_compliant'),
+    url(r'^api/licenses/(?P<hashed_sets>[\w_@-]+)/datasets/?$', base_api.get_datasets_of_licenses, name='get_datasets_of_licenses'),
     url(r'^api/licenses/search/?$', base_api.get_license_search, name='get_license_search'),
     url(r'^api/licenses/(?P<hashed_sets>[\w_@-]+)/?$', base_api.get_license_by_hash, name='get_license_by_hash'),
-    url(r'^api/licenses/', base_api.license_path, name='licenses_path'),
+    url(r'^api/licenses/?$', base_api.license_path, name='licenses_path'),
     url(r'^api/datasets/search/?$', base_api.get_dataset_search, name='get_dataset_search'),
     url(r'^api/datasets/(?P<hashed_uri>[\w_@-]+)/?$', base_api.get_dataset_by_hash, name='get_dataset_by_hash'),
-    url(r'^api/datasets/', base_api.dataset_path, name='dataset_path'),
+    url(r'^api/datasets/?$', base_api.dataset_path, name='dataset_path'),
+    url(r'^graph/?$', search_engine.graph, name='graph'),
+    url(r'', search_engine.index, name='index'),
 ]

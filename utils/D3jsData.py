@@ -4,13 +4,13 @@ def license_node(object_license):
         'permissions': object_license.get_permissions(),
         'obligations': object_license.get_obligations(),
         'prohibitions': object_license.get_prohibitions(),
-        'hashed_sets': object_license.hash(),
+        'hashed_sets': str(object_license.hash()),
         'group': 1
     }
 
 
 def compatible_link(object_license, compatible_object_license):
-    return {"source": object_license.hash(), "target": compatible_object_license.hash(), "value": 1}
+    return {"source": str(object_license.hash()), "target": str(compatible_object_license.hash()), "value": 1}
 
 
 def dataset_node(object_dataset):
@@ -23,7 +23,7 @@ def dataset_node(object_dataset):
 
 
 def dataset_link(object_license, object_dataset):
-    return {"source": object_license.hash(), "target": object_dataset.get_uri(), "value": 2}
+    return {"source": str(object_license.hash()), "target": str(object_dataset.get_uri()), "value": 2}
 
 
 def graph(nodes, links):
