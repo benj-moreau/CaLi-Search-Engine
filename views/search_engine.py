@@ -10,3 +10,8 @@ def index(request):
 @require_http_methods(['GET'])
 def graph(request):
     return render(request, 'graph.html')
+
+
+@require_http_methods(['GET'])
+def search(request):
+    return render(request, 'search.html')

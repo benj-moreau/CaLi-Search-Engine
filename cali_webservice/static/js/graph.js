@@ -33,14 +33,14 @@ function draw_graph(graph) {
     .selectAll("line")
     .data(graph.links)
     .enter().append("line")
-      .attr("stroke-width", function(d) { return Math.sqrt(d.value) + 2; });
+      .attr("stroke-width", function(d) { return Math.sqrt(d.value) + 3; });
 
   var node = svg.append("g")
       .attr("class", "nodes")
     .selectAll("circle")
     .data(graph.nodes)
     .enter().append("circle")
-      .attr("r", 10)
+      .attr("r", 15)
       .attr("fill", function(d) { return color(d.group); })
       .call(d3.drag()
           .on("start", dragstarted)
@@ -59,14 +59,14 @@ function draw_graph(graph) {
 
   function ticked() {
     link
-        .attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
+        .attr("x1", function(d) { return d.source.x * 2; })
+        .attr("y1", function(d) { return d.source.y * 2; })
+        .attr("x2", function(d) { return d.target.x * 2; })
+        .attr("y2", function(d) { return d.target.y * 2; });
 
     node
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
+        .attr("cx", function(d) { return d.x * 2; })
+        .attr("cy", function(d) { return d.y * 2; });
   }
 
   function dragstarted(d) {

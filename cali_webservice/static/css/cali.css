@@ -7,3 +7,19 @@
   stroke: #fff;
   stroke-width: 1.5px;
 }
+
+.bg-success {
+  background-color: #68D890!important;
+}
+
+.bg-danger {
+  background-color: #FF515A!important;
+}
+
+.bg-warning {
+  background-color: #FF9810!important;
+}
+
+h1 {
+    font-size: 50px!important;
+}

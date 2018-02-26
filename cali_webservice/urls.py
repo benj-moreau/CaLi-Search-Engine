@@ -29,5 +29,6 @@ urlpatterns = [
     url(r'^api/datasets/(?P<hashed_uri>[\w_@-]+)/?$', base_api.get_dataset_by_hash, name='get_dataset_by_hash'),
     url(r'^api/datasets/?$', base_api.dataset_path, name='dataset_path'),
     url(r'^graph/?$', search_engine.graph, name='graph'),
+    url(r'^search/?$', search_engine.search, name='search'),
     url(r'', search_engine.index, name='index'),
 ]

@@ -19,9 +19,11 @@
     <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
 
+    <!-- cali style -->
+    <link href="{% static "css/cali.css" %}" rel="stylesheet" type="text/css">
+
     <!-- Custom styles for this template -->
     <link href="{% static "css/clean-blog.min.css" %}" rel="stylesheet" type="text/css">
-    <link href="{% static "css/cali.css" %}" rel="stylesheet" type="text/css">
 
     <!-- VueJs -->
     <script src="https://unpkg.com/vue"></script>
@@ -29,7 +31,7 @@
   </head>
 
   <body>
-  <div id="search_engine">
+
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
       <div class="container">
@@ -58,34 +60,13 @@
     </nav>
 
     <!-- Page Header -->
-    <header class="masthead" style="background-image: url({% static "img/home-bg.jpg"  %})">
+    <header class="masthead" style="height: 150px; background-image: url({% static "img/home-bg.jpg"  %})">
       <div class="overlay"></div>
       <div class="container">
         <div class="row">
-          <div class="col-lg-12 col-md-12 mx-auto">
-            <div class="site-heading">
-                <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-4 col-md-4">
-                  <input class="form-control" v-model="query" id="search_form" placeholder="Find licensed datasets">
-                </div>
-                <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-3 col-md-3" data-toggle="tooltip" data-html="true" data-placement="bottom" title="Compatible: find more restrictive; Compliant: find Less restrictive">
-                  <select id="sens_selection" v-model="selected_sens" class="custom-select mr-sm-2">
-                    <option value="compatible" selected>compatible with</option>
-                    <option value="compliant">compliant to</option>
-                  </select>
-                </div>
-                {% verbatim %}
-                <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-2 col-md-2">
-                  <select id="license_selection" v-model="selected_license" class="custom-select mr-sm-2">
-                    <option value="">License</option>
-                    <template v-for='license in licenses'>
-                      <option v-bind:value="license.hashed_sets" v-for='label in license.labels'>{{ label }}</option>
-                    </template>
-                  </select>
-                </div>
-                <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-2 col-md-2">
-                  <a v-on:click="search()" style="padding: 9px 10px;" class="btn btn-primary" href="#">Search &rarr;</a>
-                </div>
-                {% endverbatim %}
+          <div class="col-lg-8 col-md-10 mx-auto">
+            <div style="padding: 80px 0 0px" class="site-heading">
+              <h1>N Results</h1>
             </div>
           </div>
         </div>
@@ -93,42 +74,15 @@
     </header>
 
     <!-- Main Content -->
-    <div class="container">
+    {% verbatim %}
+    <div class="container" id="search_results">
       <div class="row">
-          {% verbatim %}
-          <div v-show="selected_license_label" class="card bg-light mb-10 mx-auto text-center">
-          <div class="card-header">{{ selected_license_label }}</div>
-          <div class="card-body">
-            <div class="d-inline-block card text-white bg-success mb-10">
-              <div class="card-header">Permissions</div>
-              <div style="text-align: left!important;" class="card-body">
-                <ul class="list-group list-group-flush">
-                  <li v-for='permission in selected_license.permissions' style="padding: 0px 0px 0px 0px; background-color: transparent;" class="list-group-item">{{ permission }}</li>
-                </ul>
-              </div>
-            </div>
-            <div class="d-inline-block card text-white bg-danger mb-10">
-              <div class="card-header">Obligations</div>
-              <div style="text-align: left!important;" class="card-body">
-                <ul class="list-group list-group-flush">
-                  <li v-for='obligation in selected_license.obligations' style="padding: 0px 0px 0px 0px; background-color: transparent;" class="list-group-item">{{ obligation }}</li>
-                </ul>
-              </div>
-            </div>
-            <div class="d-inline-block card text-white bg-warning mb-10">
-              <div class="card-header">Prohibitions</div>
-              <div style="text-align: left!important;" class="card-body">
-                <ul class="list-group list-group-flush">
-                  <li v-for='prohibition in selected_license.prohibitions' style="padding: 0px 0px 0px 0px; background-color: transparent;" class="list-group-item">{{ prohibition }}</li>
-                </ul>
-              </div>
-            </div>
-          </div>
+        <div class="col-lg-8 col-md-10 mx-auto">
+
         </div>
-        {% endverbatim %}
       </div>
     </div>
-  </div>
+    {% endverbatim %}
     <hr>
 
     <!-- Footer -->
@@ -156,11 +110,12 @@
     <!-- Bootstrap core JavaScript -->
     <script src="{% static "vendor/jquery/jquery.min.js" %}"></script>
     <script src="{% static "vendor/bootstrap/js/bootstrap.bundle.min.js" %}"></script>
-
+    <!-- d3js for the graph -->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
     <!-- Custom scripts for this template -->
     <script src="{% static "js/clean-blog.min.js" %}"></script>
     <!-- Custom scripts -->
-    <script src="{% static "js/index.js" %}"></script>
+    <script src="{% static "js/search.js" %}"></script>
   </body>
 
 </html>
