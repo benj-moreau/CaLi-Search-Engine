@@ -29,7 +29,7 @@ var search = new Vue({
       });
     },
     search: function () {
-      parameters = "query=" + encodeURIComponent(this.query) + "&license=" + encodeURIComponent(this.selected_license) + "&sens=" + encodeURIComponent(this.selected_sens);
+      parameters = "query=" + encodeURIComponent(this.query) + "&license=" + encodeURIComponent(this.selected_license.hashed_sets) + "&sens=" + encodeURIComponent(this.selected_sens);
       window.location = "/search?" + parameters
     },
   },

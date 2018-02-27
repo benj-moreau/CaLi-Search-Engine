@@ -110,7 +110,14 @@ class License(object):
 
     def __repr__(self):
         """Using label to print licenses."""
-        return "{}".format(self.get_labels)
+        labels = self.get_labels()
+        license_label = ""
+        for i, label in enumerate(labels):
+            if i < 1:
+                license_label = "{}".format(label)
+            else:
+                license_label = "{}, {}".format(license_label, label)
+        return license_label
 
     def __str__(self):
         """Using label to print licenses."""

@@ -14,4 +14,8 @@ def graph(request):
 
 @require_http_methods(['GET'])
 def search(request):
-    return render(request, 'search.html')
+    query = request.GET.get('query', '')
+    license = request.GET.get('license', '')
+    sens = request.GET.get('sens', '')
+    results = '{[]}'
+    return render(request, 'search.html', {'results': results})

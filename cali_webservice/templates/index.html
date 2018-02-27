@@ -68,17 +68,17 @@
                   <input class="form-control" v-model="query" id="search_form" placeholder="Find licensed datasets">
                 </div>
                 <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-3 col-md-3" data-toggle="tooltip" data-html="true" data-placement="bottom" title="Compatible: find more restrictive; Compliant: find Less restrictive">
-                  <select id="sens_selection" v-model="selected_sens" class="custom-select mr-sm-2">
+                  <select v-model="selected_sens" id="sens_selection" class="custom-select mr-sm-2">
                     <option value="compatible" selected>compatible with</option>
                     <option value="compliant">compliant to</option>
                   </select>
                 </div>
                 {% verbatim %}
                 <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-2 col-md-2">
-                  <select id="license_selection" v-model="selected_license" class="custom-select mr-sm-2">
+                  <select v-model="selected_license" id="license_selection" class="custom-select mr-sm-2">
                     <option value="">License</option>
                     <template v-for='license in licenses'>
-                      <option v-bind:value="license.hashed_sets" v-for='label in license.labels'>{{ label }}</option>
+                      <option v-bind:value="license" v-for='label in license.labels'>{{ label }}</option>
                     </template>
                   </select>
                 </div>

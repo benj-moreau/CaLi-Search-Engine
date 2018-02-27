@@ -24,7 +24,7 @@ function draw_graph(graph) {
   var color = d3.scaleOrdinal(d3.schemeCategory20);
 
   var simulation = d3.forceSimulation()
-      .force("link", d3.forceLink().id(function(d) { return d.hashed_sets; }))
+      .force("link", d3.forceLink().id(function(d) { return d.node_id; }))
       .force("charge", d3.forceManyBody())
       .force("center", d3.forceCenter(width / 2, height / 2));
 
@@ -48,7 +48,7 @@ function draw_graph(graph) {
           .on("end", dragended));
 
   node.append("title")
-      .text(function(d) { return d.hashed_sets; });
+      .text(function(d) { return d.node_label; });
 
   simulation
       .nodes(graph.nodes)
