@@ -64,10 +64,10 @@
         <div class="row">
           <div class="col-lg-12 col-md-12 mx-auto">
             <div class="site-heading">
-                <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-4 col-md-4">
+                <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-4 col-md-4" data-toggle="tooltip" data-placement="bottom" title="Use space to separate keywords">
                   <input class="form-control" v-model="query" id="search_form" placeholder="Find licensed datasets">
                 </div>
-                <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-3 col-md-3" data-toggle="tooltip" data-html="true" data-placement="bottom" title="Compatible: find more restrictive; Compliant: find Less restrictive">
+                <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-3 col-md-3" data-toggle="tooltip" data-placement="bottom" title="Compatible: find more restrictive; Compliant: find Less restrictive">
                   <select v-model="selected_sens" id="sens_selection" class="custom-select mr-sm-2">
                     <option value="compatible" selected>compatible with</option>
                     <option value="compliant">compliant to</option>

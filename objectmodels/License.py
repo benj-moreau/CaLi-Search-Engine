@@ -91,7 +91,7 @@ class License(object):
             'obligations': self.get_obligations(),
             'prohibitions': self.get_prohibitions(),
             'datasets': [dataset.to_json() for dataset in self.datasets],
-            'hashed_sets': self.hash()
+            'hashed_sets': str(self.hash())
         }
 
     def repr_terms(self):
