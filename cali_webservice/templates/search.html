@@ -68,7 +68,7 @@
           <div class="col-lg-8 col-md-10 mx-auto">
             <div style="padding: 80px 0 0px" class="site-heading">
               {% verbatim %}
-              <h1>N Results</h1>
+              <h1>{{ nb_datasets }} Results</h1>
               {% endverbatim %}
             </div>
           </div>
@@ -78,10 +78,49 @@
 
     <!-- Main Content -->
     {% verbatim %}
-    <div class="container" id="search_results">
-      <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-          {{ results }}
+    <div class="container">
+      <button type="button" class="btn btn-light" v-on:click="show_sets = !show_sets">Toggle sets of actions</button>
+      <div class="row" v-for='license in results'>
+        <div class="card bg-light col-lg-8 col-md-10 mx-auto text-center" style="margin: 20px;padding-right: 0px;padding-left: 0px;">
+        <div class="card-header">
+          <span class="badge badge-pill badge-light" v-for='label in license.labels'>{{ label }}</span>
+        </div>
+        <div class="card-body">
+          <div style="padding:0px 0px 20px" v-show="show_sets">
+          <div class="d-inline-block card text-white bg-success mb-10" transition name="fade">
+            <div class="card-header">Permissions</div>
+            <div style="text-align: left!important;" class="card-body">
+              <ul class="list-group list-group-flush">
+                <li v-for='permission in license.permissions' style="padding: 0px 0px 0px 0px; background-color: transparent;" class="list-group-item">{{ permission }}</li>
+              </ul>
+            </div>
+          </div>
+          <div class="d-inline-block card text-white bg-danger mb-10">
+            <div class="card-header">Obligations</div>
+            <div style="text-align: left!important;" class="card-body">
+              <ul class="list-group list-group-flush">
+                <li v-for='obligation in license.obligations' style="padding: 0px 0px 0px 0px; background-color: transparent;" class="list-group-item">{{ obligation }}</li>
+              </ul>
+            </div>
+          </div>
+          <div class="d-inline-block card text-white bg-warning mb-10">
+            <div class="card-header">Prohibitions</div>
+            <div style="text-align: left!important;" class="card-body">
+              <ul class="list-group list-group-flush">
+                <li v-for='prohibition in license.prohibitions' style="padding: 0px 0px 0px 0px; background-color: transparent;" class="list-group-item">{{ prohibition }}</li>
+              </ul>
+            </div>
+          </div>
+          </div>
+          <div class="row text-left">
+            <div class="card" v-for='dataset in license.datasets'>
+              <div class="card-body">
+                <h5 class="card-title">{{dataset.label}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{dataset.uri}}</h6>
+                <p class="card-text">{{dataset.description}}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -121,7 +160,12 @@
     <!-- Custom scripts -->
     <script>
     function get_results() {
-      return "{{ results }}";
+      return JSON.parse('{{ results | escapejs }}');
+    }
+    </script>
+    <script>
+    function get_nb_datasets() {
+      return "{{ nb_datasets }}";
     }
     </script>
     <script src="{% static "js/search.js" %}"></script>

@@ -40,8 +40,6 @@ INSTALLED_APPS = (
     'cali_webservice',
 )
 
-NEOMODEL_NEO4J_BOLT_URL = os.environ.get('NEO4J_BOLT_URL', 'bolt://neo4j:test@localhost:7687')
-
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -83,7 +81,6 @@ DATABASES = {
     }
 }
 
-NEOMODEL_NEO4J_BOLT_URL = 'bolt://neo4j:admin@127.0.0.1:7687'
 NEOMODEL_SIGNALS = True
 NEOMODEL_FORCE_TIMEZONE = False
 NEOMODEL_MAX_POOL_SIZE = 50
@@ -109,3 +106,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# PUT NEOMODEL_NEO4J_BOLT_URL in your local settings
+try:
+    from local_settings import *
+except ImportError:
+    pass

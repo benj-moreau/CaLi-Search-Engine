@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
@@ -26,25 +28,34 @@ def search(request):
         neo_licenses = get_compliant_licenses(hashed_sets)
     else:
         neo_licenses = get_compatible_licenses(hashed_sets)
-    print neo_licenses
     for neo_license in neo_licenses:
         license_object = ObjectFactory.objectLicense(neo_license)
         if keywords:
             license_object = query_filter(license_object, keywords)
         if license_object:
             results.append(license_object.to_json())
-    return render(request, 'search.html', {'results': results})
+    return render(request, 'search.html', {'results': json.dumps(results), 'nb_datasets': nb_datasets(results)})
 
 
 def query_filter(license_object, keywords):
-    contains_keyword = False
+    license_contains_keyword = False
     for dataset in license_object.datasets:
+        dataset_contains_keyword = False
         for keyword in keywords:
             if keyword in dataset.label or keyword in dataset.description:
-                contains_keyword = True
-            else:
-                license_object.datasets.remove(dataset)
-    if contains_keyword:
+                dataset_contains_keyword = True
+                license_contains_keyword = True
+                break
+        if not dataset_contains_keyword:
+            license_object.datasets.remove(dataset)
+    if license_contains_keyword:
         return license_object
     else:
         return None
+
+
+def nb_datasets(results):
+    nb_datasets = 0
+    for license in results:
+        nb_datasets += len(license['datasets'])
+    return nb_datasets
