@@ -202,9 +202,24 @@ def is_empty(str_list):
 
 @fn_timer
 def add_license(request):
-    json_license = json.loads(request.body)
-    object_license = License()
-    object_license.from_json(json_license)
+    json_licenses = json.loads(request.body)
+    added_licenses = []
+    for json_license in json_licenses:
+        object_license = License()
+        object_license.from_json(json_license)
+        object_license = add_license_to_db(object_license)
+        added_licenses.append(object_license.to_json())
+    response = HttpResponse(
+        json.dumps(added_licenses),
+        content_type='application/json',
+        status=201,
+    )
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+@fn_timer
+def add_license_to_db(object_license):
     neo_license = LicenseModel.nodes.get_or_none(hashed_sets=object_license.hash())
     if neo_license:
         # update of labels list if needed
@@ -228,13 +243,7 @@ def add_license(request):
             neo_dataset.save()
         neo_license.datasets.connect(neo_dataset)
     object_license = ObjectFactory.objectLicense(neo_license)
-    response = HttpResponse(
-        json.dumps(object_license.to_json()),
-        content_type='application/json',
-        status=201,
-    )
-    response['Access-Control-Allow-Origin'] = '*'
-    return response
+    return object_license
 
 
 def update_licenses_relations_rec(new_neo_license, new_object_license, neo_license, object_license):
