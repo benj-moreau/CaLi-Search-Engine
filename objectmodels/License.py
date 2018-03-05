@@ -1,4 +1,6 @@
 from objectmodels.Dataset import Dataset
+from utils.ODRL import ACTIONS as ODRL_ACTIONS
+from utils.ODRL import SHARE_ALIKE
 
 
 class License(object):
@@ -11,13 +13,16 @@ class License(object):
         self.datasets = []
 
     def hash(self):
+        # used to compare licenses in terms of permissions, obligations, prohibitions
         return self.__hash__()
 
     def is_viable(self):
+        # is self a viable license?
         if not self.premission:
             return True
 
     def is_consolidated(self, terms):
+        # is consolidated if self uses all actions in terms set
         if self.permissions.isdisjoint(self.obligations):
             if self.permissions.isdisjoint(self.prohibitions):
                 if self.obligations.isdisjoint(self.prohibitions):
@@ -25,15 +30,21 @@ class License(object):
         return False
 
     def is_preceding(self, license):
-        # is self a precedor of license?
+        # is self compatible with license?
         if self.permissions.issuperset(license.permissions):
             if self.obligations.issubset(license.obligations):
                 if self.prohibitions.issubset(license.prohibitions):
                     return True
         return False
 
+    def share_alike_compliant(self, license):
+        # is self compatible with license is compliant with share alike conditions
+        if SHARE_ALIKE in self.obligations:
+            return False
+        return True
+
     def is_following(self, license):
-        # is self a follower of license?
+        # is self compliant with license?
         return license.is_preceding(self)
 
     def get_labels(self):
@@ -93,6 +104,18 @@ class License(object):
             'datasets': [dataset.to_json() for dataset in self.datasets],
             'hashed_sets': str(self.hash())
         }
+
+    def contains_only_odrl_actions(self):
+        for action in self.permissions:
+            if action not in ODRL_ACTIONS:
+                return False
+        for action in self.obligations:
+            if action not in ODRL_ACTIONS:
+                return False
+        for action in self.prohibitions:
+            if action not in ODRL_ACTIONS:
+                return False
+        return True
 
     def repr_terms(self):
         """Using Permissions, obligations, prohibitions to print licence."""

@@ -2,6 +2,7 @@ from django.http.response import HttpResponse
 from django.views.decorators.http import require_http_methods
 
 from neomodel import UniqueProperty, DoesNotExist
+from random import shuffle
 import json
 
 from objectmodels.Dataset import Dataset
@@ -203,12 +204,16 @@ def is_empty(str_list):
 @fn_timer
 def add_license(request):
     json_licenses = json.loads(request.body)
+    shuffle(json_licenses)
     added_licenses = []
     for json_license in json_licenses:
         object_license = License()
         object_license.from_json(json_license)
-        object_license = add_license_to_db(object_license)
-        added_licenses.append(object_license.to_json())
+        if object_license.contains_only_odrl_actions():
+            object_license = add_license_to_db(object_license)
+            added_licenses.append(object_license.to_json())
+        else:
+            added_licenses.append("Not a valid license: use only ODRL actions")
     response = HttpResponse(
         json.dumps(added_licenses),
         content_type='application/json',
@@ -233,7 +238,8 @@ def add_license_to_db(object_license):
         for neo_license_leaf in license_leaves:
             object_license_leaf = ObjectFactory.objectLicense(neo_license_leaf)
             if object_license.is_preceding(object_license_leaf):
-                neo_license_leaf.precedings.connect(neo_license)
+                if object_license.share_alike_compliant(license):
+                    neo_license_leaf.precedings.connect(neo_license)
             else:
                 update_licenses_relations_rec(neo_license, object_license, neo_license_leaf, object_license_leaf)
     for dataset in object_license.get_datasets():
@@ -255,16 +261,19 @@ def update_licenses_relations_rec(new_neo_license, new_object_license, neo_licen
             # new license is a follower of a following
             grand_follower = True
         if new_object_license.is_preceding(object_license_following):
-            neo_license_following.precedings.connect(new_neo_license)
+            if new_object_license.share_alike_compliant(object_license_following):
+                neo_license_following.precedings.connect(new_neo_license)
             if new_object_license.is_following(object_license):
                 # new_license is between license and its following_license.
-                neo_license.followings.connect(new_neo_license)
+                if object_license.share_alike_compliant(new_object_license):
+                    neo_license.followings.connect(new_neo_license)
                 neo_license.followings.disconnect(neo_license_following)
         else:
             update_licenses_relations_rec(new_neo_license, new_object_license, neo_license_following, object_license_following)
     if not grand_follower and new_object_license.is_following(object_license):
         # then its just the next follower of the current license
-        neo_license.followings.connect(new_neo_license)
+        if object_license.share_alike_compliant(new_object_license):
+            neo_license.followings.connect(new_neo_license)
 
 
 @fn_timer
