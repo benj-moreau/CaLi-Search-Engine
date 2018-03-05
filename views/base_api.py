@@ -2,7 +2,6 @@ from django.http.response import HttpResponse
 from django.views.decorators.http import require_http_methods
 
 from neomodel import UniqueProperty, DoesNotExist
-from random import shuffle
 import json
 
 from objectmodels.Dataset import Dataset
@@ -10,6 +9,7 @@ from objectmodels.License import License
 from neomodels import NeoFactory, ObjectFactory
 from neomodels.NeoModels import LicenseModel, DatasetModel, license_filter_labels, dataset_filter_search, license_filter_sets, get_leaf_licenses, get_compliant_licenses, get_compatible_licenses
 from utils.TimerDecorator import fn_timer
+from utils.authentificator import need_auth
 from utils import D3jsData
 
 
@@ -53,6 +53,7 @@ def get_datasets(request):
     return response
 
 
+@need_auth
 def add_dataset(request):
     json_dataset = json.loads(request.body)
     object_dataset = Dataset()
@@ -201,10 +202,10 @@ def is_empty(str_list):
     return False
 
 
+@need_auth
 @fn_timer
 def add_license(request):
     json_licenses = json.loads(request.body)
-    shuffle(json_licenses)
     added_licenses = []
     for json_license in json_licenses:
         object_license = License()
