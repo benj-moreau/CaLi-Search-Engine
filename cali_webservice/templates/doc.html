@@ -66,7 +66,7 @@
         <div class="row">
           <div class="col-lg-8 col-md-10 mx-auto">
             <div style="padding: 80px 0 0px" class="site-heading">
-              <h1>CaLi Graph</h1>
+              <h1>API</h1>
             </div>
           </div>
         </div>
@@ -74,12 +74,34 @@
     </header>
 
     <!-- Main Content -->
-    <div class="container-fluid" id="graph">
-      <svg id="chart" width="1100" height="350"
-        viewBox="0 0 2200 700"
-        perserveAspectRatio="xMinYMid">
-      </svg>
+    {% verbatim %}
+    <div class="container" id="doc">
+      <div v-for="interface in api">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb" style="display: flex; justify-content: space-between">
+            <li class="breadcrumb-item active" >{{interface.path}}</li>
+            <span class="badge badge-success" style="margin: 7px">{{interface.method}}</span>
+          </ol>
+        </nav>
+        <table class="table" v-if="interface.params">
+          <thead>
+            <tr>
+              <th scope="col">Parameter</th>
+              <th scope="col">description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="param in interface.params">
+              <td>{{param.name}}</td>
+              <td>{{param.descr}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>{{interface.descr}}</p>
+        <hr style="margin-bottom: 70px">
+      </div>
     </div>
+    {% endverbatim %}
 
     <hr>
 
@@ -113,7 +135,7 @@
     <!-- Custom scripts for this template -->
     <script src="{% static "js/clean-blog.min.js" %}"></script>
     <!-- Custom scripts -->
-    <script src="{% static "js/graph.js" %}"></script>
+    <script src="{% static "js/doc.js" %}"></script>
   </body>
 
 </html>

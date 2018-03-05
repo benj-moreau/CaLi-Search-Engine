@@ -17,7 +17,6 @@ from django.conf.urls import include, url
 from views import base_api, search_engine
 
 urlpatterns = [
-    # url(r'^api/', include('')),
     url(r'^api/licenses/graph/?$', base_api.get_graph, name='get_graph'),
     url(r'^api/licenses/(?P<hashed_sets>[\w_@-]+)/compatible/?$', base_api.get_compatible, name='get_compatible'),
     url(r'^api/licenses/(?P<hashed_sets>[\w_@-]+)/compliant/?$', base_api.get_compliant, name='get_compliant'),
@@ -30,5 +29,7 @@ urlpatterns = [
     url(r'^api/datasets/?$', base_api.dataset_path, name='dataset_path'),
     url(r'^graph/?$', search_engine.graph, name='graph'),
     url(r'^search/?$', search_engine.search, name='search'),
+    url(r'^api/?$', search_engine.api, name='api'),
+    url(r'^about/?$', search_engine.about, name='about'),
     url(r'', search_engine.index, name='index'),
 ]

@@ -60,13 +60,13 @@
     </nav>
 
     <!-- Page Header -->
-    <header class="masthead" style="height: 150px; background-image: url({% static "img/home-bg.jpg"  %})">
+    <header class="masthead" style="background-image: url({% static "img/home-bg.jpg"  %})">
       <div class="overlay"></div>
       <div class="container">
         <div class="row">
           <div class="col-lg-8 col-md-10 mx-auto">
-            <div style="padding: 80px 0 0px" class="site-heading">
-              <h1>CaLi Graph</h1>
+            <div class="site-heading">
+              <h1>About</h1>
             </div>
           </div>
         </div>
@@ -74,13 +74,31 @@
     </header>
 
     <!-- Main Content -->
-    <div class="container-fluid" id="graph">
-      <svg id="chart" width="1100" height="350"
-        viewBox="0 0 2200 700"
-        perserveAspectRatio="xMinYMid">
-      </svg>
-    </div>
+    <div class="container">
+      <div class="col-lg-8 col-md-10 mx-auto">
+      <h2 class="post-title">About CaLi</h2>
 
+      <p>CaLi is a lattice-based model to classify licenses. CaLi classifications are able to automatically answer questions like,
+      what are the licenses that are compliant with a specific license? And what are the licenses that are compatible with a specific license?
+      This license-based search engine is powered by a CaLi Classification and is able to classify licensed datasets.</p>
+      </div>
+
+      <div class="col-lg-8 col-md-10 mx-auto"><p class="post-meta" style="margin: 0px 0; font-size: 18px; font-style: italic; color: #868e96;">The source code of this work is available on GitHub under the MIT license</p></div>
+
+      <div class="col-lg-8 col-md-10 mx-auto"><p class="post-meta" style="margin: 0px 0; font-size: 18px; font-style: italic; color: #868e96;">Cali Search Engine is a service created by Benjamin MOREAU with GDD research group - LS2N, University of Nantes and OpenDataSoft company.</p></div>
+
+      <div style="display: flex; justify-content: space-around">
+        <div class="align-middle" style="width: 236px; height: 130px; background-image: url({% static "img/ls2n.jpg"  %}); background-repeat: no-repeat; background-size:cover"></div>
+        <div class="align-middle" style="width: 237px; height: 53px; background-image: url({% static "img/ods.jpg"  %}); background-repeat: no-repeat; background-size:cover; margin-top: auto; margin-bottom: auto;"></div>
+      </div>
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <h2 class="post-title">Contact</h2>
+        <h3 class="post-subtitle" style="font-weight: 300;margin: 0 0 10px">MOREAU Benjamin</h3>
+        <p class="post-meta" style="margin: 0px 0; font-size: 18px; font-style: italic; color: #868e96;">benjamin.moreau1@univ-nantes.fr</p>
+        <p class="post-meta" style="margin: 0px 0; font-size: 18px; font-style: italic; color: #868e96;">benjamin.moreau@opendatasoft.com</p>
+      </div>
+
+    </div>
     <hr>
 
     <!-- Footer -->
@@ -112,8 +130,6 @@
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <!-- Custom scripts for this template -->
     <script src="{% static "js/clean-blog.min.js" %}"></script>
-    <!-- Custom scripts -->
-    <script src="{% static "js/graph.js" %}"></script>
   </body>
 
 </html>

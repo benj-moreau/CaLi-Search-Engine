@@ -18,13 +18,23 @@ def graph(request):
 
 
 @require_http_methods(['GET'])
+def api(request):
+    return render(request, 'doc.html')
+
+
+@require_http_methods(['GET'])
+def about(request):
+    return render(request, 'about.html')
+
+
+@require_http_methods(['GET'])
 def search(request):
     query = request.GET.get('query', '')
     hashed_sets = request.GET.get('license', '')
     sens = request.GET.get('sens', '')
     keywords = query.split()
     results = []
-    if sens == 'compliant':
+    if sens == 'compatible':
         neo_licenses = get_compliant_licenses(hashed_sets)
     else:
         neo_licenses = get_compatible_licenses(hashed_sets)

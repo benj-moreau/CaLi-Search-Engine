@@ -180,7 +180,7 @@ def get_datasets_of_licenses(request, hashed_sets):
         neo_license = LicenseModel.nodes.get(hashed_sets=hashed_sets)
         license_datasets = []
         for dataset in neo_license.datasets.all():
-            dataset_object = ObjectFactory.Dataset(dataset)
+            dataset_object = ObjectFactory.objectDataset(dataset)
             license_datasets.append(dataset_object.to_json())
         response = HttpResponse(
             json.dumps(license_datasets),
@@ -279,7 +279,7 @@ def update_licenses_relations_rec(new_neo_license, new_object_license, neo_licen
 
 @fn_timer
 @require_http_methods(['GET'])
-def get_compatible(request, hashed_sets):
+def get_compliant(request, hashed_sets):
     try:
         neo_licenses = get_compatible_licenses(hashed_sets)
         compatible_licenses = []
@@ -301,7 +301,7 @@ def get_compatible(request, hashed_sets):
 
 @fn_timer
 @require_http_methods(['GET'])
-def get_compliant(request, hashed_sets):
+def get_compatible(request, hashed_sets):
     try:
         neo_licenses = get_compliant_licenses(hashed_sets)
         compatible_licenses = []
