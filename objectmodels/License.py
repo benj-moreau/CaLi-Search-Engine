@@ -7,9 +7,9 @@ class License(object):
 
     def __init__(self):
         self.labels = []
-        self.permissions = set()
-        self.obligations = set()
-        self.prohibitions = set()
+        self.permissions = frozenset()
+        self.obligations = frozenset()
+        self.prohibitions = frozenset()
         self.datasets = []
 
     def hash(self):
@@ -66,18 +66,18 @@ class License(object):
         self.labels = labels
 
     def set_permissions(self, permissions):
-        if not isinstance(permissions, set):
-            raise TypeError("permissions must be of type: set")
+        if not isinstance(permissions, frozenset):
+            raise TypeError("permissions must be of type: frozenset")
         self.permissions = permissions
 
     def set_obligations(self, obligations):
-        if not isinstance(obligations, set):
-            raise TypeError("obligations must be of type: set")
+        if not isinstance(obligations, frozenset):
+            raise TypeError("obligations must be of type: frozenset")
         self.obligations = obligations
 
     def set_prohibitions(self, prohibitions):
-        if not isinstance(prohibitions, set):
-            raise TypeError("prohibitions must be of type: set")
+        if not isinstance(prohibitions, frozenset):
+            raise TypeError("prohibitions must be of type: frozenset")
         self.prohibitions = prohibitions
 
     def set_datasets(self, datasets):
@@ -85,9 +85,9 @@ class License(object):
 
     def from_json(self, json_license):
         self.set_labels(json_license['labels'])
-        self.set_permissions(set(json_license['permissions']))
-        self.set_obligations(set(json_license['obligations']))
-        self.set_prohibitions(set(json_license['prohibitions']))
+        self.set_permissions(frozenset(json_license['permissions']))
+        self.set_obligations(frozenset(json_license['obligations']))
+        self.set_prohibitions(frozenset(json_license['prohibitions']))
         datasets = []
         for dataset in json_license['datasets']:
             dataset_object = Dataset()
@@ -102,7 +102,7 @@ class License(object):
             'obligations': self.get_obligations(),
             'prohibitions': self.get_prohibitions(),
             'datasets': [dataset.to_json() for dataset in self.datasets],
-            'hashed_sets': str(self.hash())
+            'hashed_sets': self.hash()
         }
 
     def contains_only_odrl_actions(self):
@@ -129,7 +129,7 @@ class License(object):
 
     def __hash__(self):
         """Using Permissions, obligations, prohibitions to differentiate licenses."""
-        return hash("{}".format([self.permissions, self.obligations, self.prohibitions]))
+        return str(hash(self.permissions) + hash(self.obligations) + hash(self.prohibitions))
 
     def __repr__(self):
         """Using label to print licenses."""

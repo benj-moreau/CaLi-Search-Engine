@@ -5,9 +5,9 @@ from objectmodels.Dataset import Dataset
 def objectLicense(neo_license):
     obj_license = License()
     obj_license.set_labels(neo_license.labels)
-    obj_license.set_permissions(set(neo_license.permissions))
-    obj_license.set_obligations(set(neo_license.obligations))
-    obj_license.set_prohibitions(set(neo_license.prohibitions))
+    obj_license.set_permissions(frozenset(neo_license.permissions))
+    obj_license.set_obligations(frozenset(neo_license.obligations))
+    obj_license.set_prohibitions(frozenset(neo_license.prohibitions))
     datasets = []
     for neo_dataset in neo_license.datasets.all():
         datasets.append(objectDataset(neo_dataset))
