@@ -28,13 +28,13 @@ function draw_graph(graph) {
         return  d.node_id;
     })
     .distance(function (d) {
-      return (d.value == 1) ? 130 : 50;;
+      return (d.value == 1) ? 100 : 30;;
     })
     .strength(1);
 
   var simulation = d3.forceSimulation()
       .force("link", forceLink)
-      .force("charge", d3.forceManyBody().strength(-100))
+      .force("charge", d3.forceManyBody().strength(-300))
       .force("center", d3.forceCenter(width, height))
       .force('collision', d3.forceCollide().radius(function(d) {return d.radius}));
 
@@ -43,7 +43,7 @@ function draw_graph(graph) {
   .enter().append("svg:marker")    // This section adds in the arrows
     .attr("id", String)
     .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 21)
+    .attr("refX", 20)
     .attr("refY", 0)
     .attr("markerWidth", 4)
     .attr("markerHeight", 4)
@@ -67,6 +67,9 @@ function draw_graph(graph) {
     .enter().append("circle")
       .attr("r", function(d) { return (d.group == 1) ? 20 : 8; })
       .attr("fill", function(d) { return color(d.group); })
+      .attr("opacity", function(d) { return (d.group == 1) ? 1 : 0.7; })
+      .on("mouseover", mouseover)
+      .on("mouseout", mouseout)
       .call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
@@ -80,8 +83,10 @@ function draw_graph(graph) {
     .selectAll("text")
     .data(graph.nodes)
     .enter().append("text")
-      .text(function (d) {return (d.group == 1) ? d.node_label : ""; })
-      .attr("pointer-events", "none");
+      .text(function (d) {return d.node_label})
+      .style("opacity", function(d) { return (d.group == 1) ? 0.75 : 0; })
+      .attr("pointer-events", "none")
+      .attr("class", "noselect");
 
   simulation
       .nodes(graph.nodes)
@@ -104,6 +109,18 @@ function draw_graph(graph) {
     node_label
         .attr("dx", function(d) { return d.x + 20; })
         .attr("dy", function(d) { return d.y + 10; });
+  }
+
+  function mouseover() {
+  d3.select(this).transition()
+      .duration(400)
+      .attr("r", function(d) { return (d.group == 1) ? 30 : 12; });
+  }
+
+  function mouseout() {
+    d3.select(this).transition()
+        .duration(400)
+        .attr("r", function(d) { return (d.group == 1) ? 20 : 8; });
   }
 
   function dragstarted(d) {
