@@ -48,17 +48,14 @@ def search(request):
 
 
 def query_filter(license_object, keywords):
-    license_contains_keyword = False
+    matching_datasets = []
     for dataset in license_object.datasets:
-        dataset_contains_keyword = False
         for keyword in keywords:
-            if keyword in dataset.label or keyword in dataset.description:
-                dataset_contains_keyword = True
-                license_contains_keyword = True
+            if keyword.lower() in dataset.label.lower() or keyword.lower() in dataset.description.lower():
+                matching_datasets.append(dataset)
                 break
-        if not dataset_contains_keyword:
-            license_object.datasets.remove(dataset)
-    if license_contains_keyword:
+    if matching_datasets:
+        license_object.datasets = matching_datasets
         return license_object
     else:
         return None
