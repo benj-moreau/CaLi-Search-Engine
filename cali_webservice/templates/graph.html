@@ -76,9 +76,20 @@
     <!-- Main Content -->
     <div class="container-fluid" id="graph">
       <svg id="chart" width="1100" height="450"
-        viewBox="0 0 2200 900"
-        perserveAspectRatio="xMinYMid">
+      viewBox="-825 -260 1650 675">
       </svg>
+    </div>
+    <div class="legend" style="display: flex; justify-content: center; height: 25px">
+      <div class="align-middle bg-sized" style="width: 57.5px; height: 17px; background-image: url({% static "img/compatible.jpg"  %}); margin-top: auto; margin-bottom: auto;"></div>
+      <p class="copyright text-muted" style="font-size: 15px; margin-top: auto; margin-bottom: auto;">: <span style="font-style: italic;">"Compatible with"</span> relation</p>
+      <div class="align-middle bg-sized" style="width: 24.5px; height: 24.5px; background-image: url({% static "img/license.jpg"  %}); margin-top: auto; margin-bottom: auto; margin-left: 15px"></div>
+      <p class="copyright text-muted" style="font-size: 15px; margin-top: auto; margin-bottom: auto;">: License</p>
+    </div>
+    <div class="legend" style="display: flex; justify-content: center; height: 22px">
+      <div class="align-middle bg-sized" style="width: 22.3px; height: 16px; background-image: url({% static "img/association.jpg"  %}); margin-top: auto; margin-bottom: auto;"></div>
+      <p class="copyright text-muted" style="font-size: 15px; margin-top: auto; margin-bottom: auto;">: License/Dataset association</p>
+      <div class="align-middle bg-sized" style="width: 9px; height: 9px; background-image: url({% static "img/dataset.jpg"  %}); margin-top: auto; margin-bottom: auto; margin-left: 15px"></div>
+      <p class="copyright text-muted" style="font-size: 15px; margin-top: auto; margin-bottom: auto;">: Dataset</p>
     </div>
 
     <hr>
@@ -99,7 +110,7 @@
               </li>
             </ul>
             <p class="copyright text-muted">This service does not provide legal advice.</p>
-            <p class="copyright text-muted">Copyright &copy; 2018</p>
+            <p class="copyright text-muted">This site is under MIT license</p>
           </div>
         </div>
       </div>

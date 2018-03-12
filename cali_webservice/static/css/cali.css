@@ -18,6 +18,14 @@
                                   supported by Chrome and Opera */
 }
 
+.bg-sized {
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
 .bg-success {
   background-color: #68D890!important;
 }

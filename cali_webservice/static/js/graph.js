@@ -35,7 +35,7 @@ function draw_graph(graph) {
   var simulation = d3.forceSimulation()
       .force("link", forceLink)
       .force("charge", d3.forceManyBody().strength(-300))
-      .force("center", d3.forceCenter(width/1.1, height/1.15))
+      //.force("center", d3.forceCenter(width/2, height/2))
       .force('collision', d3.forceCollide().radius(function(d) {return d.radius}));
 
   svg.append("defs").selectAll("marker")
