@@ -1,4 +1,3 @@
 {
-	"terms":["CommercialUse", "Distribution", "Reproduction", "DerivativeWork"],
-	"terms2":["CommercialUse", "Distribution", "Reproduction", "DerivativeWork", "Notice", "Attribution"]
+	"terms":["CommercialUse", "Distribution", "Reproduction", "DerivativeWork", "Notice", "Attribution", "ShareAlike"]
 }

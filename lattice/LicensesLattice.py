@@ -50,11 +50,13 @@ class LicenseCombinor(Thread):
                         else:
                             label_dict_lock.release()
 
+    @fn_timer
     def combination_function(self, cl1, cl2, label):
         permissions = cl1.permissions & cl2.permissions
         obligations = cl1.obligations | cl2.obligations
         prohibitions = cl1.prohibitions | cl2.prohibitions
-        obligations, prohibitions = self.combination_priority(obligations, prohibitions, "obligation")
+        # sumbsumption
+        # obligations, prohibitions = self.combination_priority(obligations, prohibitions, "obligation")
         parents = [(cl1, cl2)]
         new_cl = ConsolidatedLicense(label, permissions, obligations, prohibitions, parents, [])
         cl1.childs.append(new_cl)

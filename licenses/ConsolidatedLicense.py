@@ -14,11 +14,7 @@ class ConsolidatedLicense(object):
         self.childs = childs
 
     def is_consolidated(self, terms):
-        if self.permissions.isdisjoint(self.obligations):
-            if self.permissions.isdisjoint(self.prohibitions):
-                if self.obligations.isdisjoint(self.prohibitions):
-                    return (self.permissions | self.obligations | self.prohibitions) == terms
-        return False
+        return (self.permissions | self.obligations | self.prohibitions) == terms
 
     def get_label(self):
         label = ""
@@ -48,7 +44,7 @@ class ConsolidatedLicense(object):
 
     def __eq__(self, other):
         """Using label to differentiate licenses in lattice' sets."""
-        return isinstance(other, ConsolidatedLicense) and self.label == other.label
+        return isinstance(other, ConsolidatedLicense) and self.hash == other.hash
 
     def __hash__(self):
         """Using label to differentiate licenses in lattice' sets."""

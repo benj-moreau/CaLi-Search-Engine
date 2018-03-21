@@ -14,8 +14,10 @@ pip install -r requirements.txt
 Navigate to cali folder and execute:
 
 ```bash
-python cali.py <t>
+python cali.py <file> <threads>
 ```
-replace `<t>` with the Term set cardinality (e.g. the number of actions)
+replace `<file>` with the filename containing the set of terms
 
-> python cali.py 5
+replace `<threads>` with the maximum number of combination a thread should handle
+
+> python cali.py terms.json 200
