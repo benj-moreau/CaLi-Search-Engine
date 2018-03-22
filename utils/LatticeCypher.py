@@ -5,9 +5,9 @@ RELATION_CREATION = 'CREATE(({})-[:Preserves]->({}))'
 def generate_cypher_files(lattice, nb_terms):
     with open('licenses_A{}.cypher'.format(nb_terms), 'w') as licenses_file:
         relations = ""
-        licenses_file.write("{}\n".format(LICENSE_CREATION.format('_', '{}', '{}', '{}', '{}', '{}', 0)))
+        licenses_file.write("{}\n".format(LICENSE_CREATION.format('L0', 'A', '{}', '{}', '{}', '{}', 0)))
         for license in lattice.set[1]:
-            relations = "{}{}\n".format(relations, RELATION_CREATION.format('_', license.get_label()))
+            relations = "{}{}\n".format(relations, RELATION_CREATION.format('L0', license.get_label()))
         for level_number, level in enumerate(lattice.set):
             for license in level:
                 licenses_file.write("{}\n".format(_generate_node(license, level_number)))
