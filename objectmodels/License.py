@@ -1,6 +1,5 @@
 from objectmodels.Dataset import Dataset
 from utils.ODRL import ACTIONS as ODRL_ACTIONS
-from utils.ODRL import SHARE_ALIKE, DERIVATIVE_WORKS
 
 
 class License(object):
