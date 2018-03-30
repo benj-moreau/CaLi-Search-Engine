@@ -1,6 +1,6 @@
 from objectmodels.Dataset import Dataset
 from utils.ODRL import ACTIONS as ODRL_ACTIONS
-from utils.ODRL import SHARE_ALIKE
+from utils.ODRL import SHARE_ALIKE, DERIVATIVE_WORKS
 
 
 class License(object):
@@ -15,11 +15,6 @@ class License(object):
     def hash(self):
         # used to compare licenses in terms of permissions, obligations, prohibitions
         return self.__hash__()
-
-    def is_viable(self):
-        # is self a viable license?
-        if not self.premission:
-            return True
 
     def is_consolidated(self, terms):
         # is consolidated if self uses all actions in terms set
@@ -36,12 +31,6 @@ class License(object):
                 if self.prohibitions.issubset(license.prohibitions):
                     return True
         return False
-
-    def share_alike_compliant(self, license):
-        # is self compatible with license is compliant with share alike conditions
-        if SHARE_ALIKE in self.obligations:
-            return False
-        return True
 
     def is_following(self, license):
         # is self compliant with license?
