@@ -45,7 +45,7 @@ class LicenseCombinor(Thread):
                         if self.prune_filter(new_license):
                             label_dict[hashed_label] = new_license
                             label_dict_lock.release()
-                            self.add_in_hash_table(new_license)
+                            self.add_in_hash_table(new_license, self.lattice)
                             self.new_layer.add(new_license)
                         else:
                             label_dict_lock.release()
@@ -74,11 +74,14 @@ class LicenseCombinor(Thread):
         # return cl.is_consolidated(self.terms)
         return True
 
-    def add_in_hash_table(self, license):
+    def add_in_hash_table(self, license, lattice):
         licenses_hash_table_lock.acquire()
         if license.hash in licenses_hash_table:
             licenses_hash_table[license.hash].append(license)
         else:
+            lattice.nb_licenses += 1
+            if license.is_viable():
+                lattice.nb_viable += 1
             licenses_hash_table[license.hash] = [license]
         licenses_hash_table_lock.release()
 
@@ -88,11 +91,16 @@ class LicensesLattice(Lattice):
     def __init__(self, terms, powerset):
         super(LicensesLattice, self).__init__(terms, powerset)
         self.licenses_hash_table = {}
+        self.nb_viable = 0
+        self.nb_licenses = 0
         # Update hash table with powerset's licenses
         for license in self.set[self.height()-1]:
             if license.hash in licenses_hash_table:
                 licenses_hash_table[license.hash].append(license)
             else:
+                self.nb_licenses += 1
+                if license.is_viable():
+                    self.nb_viable += 1
                 licenses_hash_table[license.hash] = [license]
 
     @fn_timer

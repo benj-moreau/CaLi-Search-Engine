@@ -16,6 +16,11 @@ class ConsolidatedLicense(object):
     def is_consolidated(self, terms):
         return (self.permissions | self.obligations | self.prohibitions) == terms
 
+    def is_viable(self):
+        if not(self.permissions.isdisjoint(self.obligations) and self.permissions.isdisjoint(self.prohibitions) and self.obligations.isdisjoint(self.prohibitions)):
+            return False
+        return True
+
     def get_label(self):
         label = ""
         for l in self.label:
