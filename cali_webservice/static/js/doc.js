@@ -29,7 +29,7 @@ var api_doc = new Vue({
         'method': 'GET',
         'path': 'api/licenses',
         'params': null,
-        'descr': 'Retrieve all licensed datasets'
+        'descr': 'Retrieve all licenses'
       },
       {
         'method': 'GET',
@@ -41,7 +41,7 @@ var api_doc = new Vue({
         'method': 'GET',
         'path': 'api/licenses/[id]/compatible',
         'params': [{'name': '[id]', 'descr': 'The id of the license'}],
-        'descr': 'Retrieve all licenses that are compliant with a specific license using the id of the license'
+        'descr': 'Retrieve all licenses that are compatible with a specific license using the id of the license'
       },
       {
         'method': 'GET',
