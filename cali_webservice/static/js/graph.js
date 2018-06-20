@@ -28,14 +28,15 @@ function draw_graph(graph) {
         return  d.node_id;
     })
     .distance(function (d) {
-      return (d.value == 1) ? 100 : 30;;
+      return (d.value == 1) ? 100 : 40;;
     })
-    .strength(1);
+    .strength(1)
+    .iterations(10);
 
   var simulation = d3.forceSimulation()
       .force("link", forceLink)
-      .force("charge", d3.forceManyBody().strength(-300))
-      //.force("center", d3.forceCenter(width/2, height/2))
+      .force("charge", d3.forceManyBody().strength(-90))
+      .force("center", d3.forceCenter())
       .force('collision', d3.forceCollide().radius(function(d) {return d.radius}));
 
   svg.append("defs").selectAll("marker")
@@ -90,10 +91,10 @@ function draw_graph(graph) {
 
   simulation
       .nodes(graph.nodes)
-      .on("tick", ticked);
+      .on("tick", ticked)
+      .force("link").links(graph.links);
 
-  simulation.force("link")
-      .links(graph.links);
+
 
   function ticked() {
     link
@@ -103,12 +104,14 @@ function draw_graph(graph) {
         .attr("y2", function(d) { return d.target.y; });
 
     node
+        .each(function(d) {d.y -= ((d.level-3)*1.1)})
         .attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; });
 
     node_label
         .attr("dx", function(d) { return d.x + 20; })
         .attr("dy", function(d) { return d.y + 10; });
+    simulation.alphaTarget(0.3).restart();
   }
 
   function mouseover() {
@@ -124,7 +127,7 @@ function draw_graph(graph) {
   }
 
   function dragstarted(d) {
-    if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+    //if (!d3.event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
     d.fy = d.y;
   }
@@ -135,10 +138,19 @@ function draw_graph(graph) {
   }
 
   function dragended(d) {
-    if (!d3.event.active) simulation.alphaTarget(0);
     d.fx = null;
     d.fy = null;
   }
+
+  var zoomed = function() {
+    link.attr("transform", d3.event.transform);
+    node.attr("transform", d3.event.transform);
+    node_label.attr("transform", d3.event.transform);
+  }
+
+  svg.call(d3.zoom()
+  	.scaleExtent([1 / 2, 12])
+  	.on("zoom", zoomed));
 }
 
 var chart = $("#chart"),

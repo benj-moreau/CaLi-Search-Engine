@@ -47,6 +47,9 @@ class License(object):
     def get_prohibitions(self):
         return [str(prohibitions) for prohibitions in self.prohibitions]
 
+    def get_level(self):
+        return len(self.obligations) + len(self.prohibitions)
+
     def get_datasets(self):
         return self.datasets
 

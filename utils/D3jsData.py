@@ -4,6 +4,7 @@ def license_node(object_license):
         'permissions': object_license.get_permissions(),
         'obligations': object_license.get_obligations(),
         'prohibitions': object_license.get_prohibitions(),
+        'level': object_license.get_level(),
         'hashed_sets': str(object_license.hash()),
         'node_id': str(object_license.hash()),
         'group': 1
@@ -14,12 +15,13 @@ def compatible_link(object_license, compatible_object_license):
     return {"source": str(object_license.hash()), "target": str(compatible_object_license.hash()), "value": 1}
 
 
-def dataset_node(object_dataset):
+def dataset_node(object_dataset, level):
     return {
         'node_label': object_dataset.get_label(),
         'uri': object_dataset.get_uri(),
         'description': object_dataset.get_description(),
         'node_id': str(object_dataset.hash()),
+        'level': level,
         'group': 2,
     }
 

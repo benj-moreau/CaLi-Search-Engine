@@ -333,9 +333,10 @@ def get_graph(request):
     for neo_license in LicenseModel.nodes:
         license_object = ObjectFactory.objectLicense(neo_license)
         nodes.append(D3jsData.license_node(license_object))
+        license_level = license_object.get_level()
         for neo_dataset in neo_license.datasets.all():
             dataset_object = ObjectFactory.objectDataset(neo_dataset)
-            nodes.append(D3jsData.dataset_node(dataset_object))
+            nodes.append(D3jsData.dataset_node(dataset_object, license_level))
             links.append(D3jsData.dataset_link(license_object, dataset_object))
         for compatible_neo_license in neo_license.followings.all():
             compatible_license_object = ObjectFactory.objectLicense(compatible_neo_license)
