@@ -27,7 +27,12 @@ def license_filter_sets(values, set_name):
 
 
 def get_leaf_licenses():
-    results, columns = db.cypher_query("match(license:LicenseModel) WHERE not ()-[:Compatible]->(license) RETURN license")
+    results, columns = db.cypher_query("match(license:LicenseModel) WHERE not ()-[:Compatible]->(license) RETURN license ORDER BY (size(license.prohibitions)+size(license.obligations)) ASC")
+    return [LicenseModel().inflate(row[0]) for row in results]
+
+
+def get_root_licenses():
+    results, columns = db.cypher_query("match(license:LicenseModel) WHERE not ()<-[:Compatible]-(license) RETURN license ORDER BY (size(license.prohibitions)+size(license.obligations)) DESC")
     return [LicenseModel().inflate(row[0]) for row in results]
 
 

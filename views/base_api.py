@@ -3,23 +3,28 @@ from django.views.decorators.http import require_http_methods
 
 from neomodel import UniqueProperty, DoesNotExist
 import json
+import random
 
 from objectmodels.Dataset import Dataset
 from objectmodels.License import License
+from neomodel import clear_neo4j_database, db
 from neomodels import NeoFactory, ObjectFactory
-from neomodels.NeoModels import LicenseModel, DatasetModel, license_filter_labels, dataset_filter_search, license_filter_sets, get_leaf_licenses, get_compliant_licenses, get_compatible_licenses
+from neomodels.NeoModels import LicenseModel, DatasetModel, license_filter_labels, dataset_filter_search, license_filter_sets
+from neomodels.NeoModels import get_leaf_licenses, get_root_licenses, get_compliant_licenses, get_compatible_licenses
 from utils.TimerDecorator import fn_timer
 from utils.authentificator import need_auth
 from utils import D3jsData
 from utils import Constraints
 
 
-@require_http_methods(['GET', 'POST'])
+@require_http_methods(['GET', 'POST', 'DELETE'])
 def license_path(request):
     if request.method == 'GET':
         return get_licenses(request)
     elif request.method == 'POST':
         return add_license(request)
+    elif request.method == 'DELETE':
+        return delete_license(request)
 
 
 @require_http_methods(['GET', 'POST'])
@@ -78,6 +83,7 @@ def add_dataset(request):
     return response
 
 
+@require_http_methods(['GET'])
 def get_license_by_hash(request, hashed_sets):
     try:
         neo_license = LicenseModel.nodes.get(hashed_sets=hashed_sets)
@@ -85,13 +91,13 @@ def get_license_by_hash(request, hashed_sets):
         response = HttpResponse(
             json.dumps(license_object.to_json()),
             content_type='application/json')
+        response['Access-Control-Allow-Origin'] = '*'
     except DoesNotExist:
         response = HttpResponse(
             "{}",
             content_type='application/json',
             status=404,
         )
-    response['Access-Control-Allow-Origin'] = '*'
     return response
 
 
@@ -208,6 +214,7 @@ def is_empty(str_list):
 def add_license(request):
     json_licenses = json.loads(request.body)
     added_licenses = []
+    random.shuffle(json_licenses)
     for json_license in json_licenses:
         object_license = License()
         object_license.from_json(json_license)
@@ -237,16 +244,8 @@ def add_license_to_db(object_license):
         neo_license.save()
     else:
         # license does not exists in db
-        license_leaves = get_leaf_licenses()
-        neo_license = NeoFactory.NeoLicense(object_license)
-        neo_license.save()
-        for neo_license_leaf in license_leaves:
-            object_license_leaf = ObjectFactory.objectLicense(neo_license_leaf)
-            if object_license.is_preceding(object_license_leaf):
-                if Constraints.is_compatibility_viable(object_license, object_license_leaf):
-                    neo_license_leaf.precedings.connect(neo_license)
-            else:
-                update_licenses_relations_rec(neo_license, object_license, neo_license_leaf, object_license_leaf)
+        # neo_license = update_licenses_relations_infimum(object_license)
+        neo_license = update_licenses_relations_supremum(object_license)
     for dataset in object_license.get_datasets():
         neo_dataset = DatasetModel.nodes.get_or_none(hashed_uri=dataset.hash())
         if not neo_dataset:
@@ -257,28 +256,130 @@ def add_license_to_db(object_license):
     return object_license
 
 
-def update_licenses_relations_rec(new_neo_license, new_object_license, neo_license, object_license):
+def update_licenses_relations_infimum(object_license):
+    license_leaves = get_leaf_licenses()
+    neo_license = NeoFactory.NeoLicense(object_license)
+    neo_license.save()
+    linked_to = []
+    already_tested = [object_license]
+    for neo_license_leaf in license_leaves:
+        object_license_leaf = ObjectFactory.objectLicense(neo_license_leaf)
+        if object_license.is_preceding(object_license_leaf):
+            if Constraints.is_compatibility_viable(object_license, object_license_leaf):
+                neo_license_leaf.precedings.connect(neo_license)
+                linked_to.append(object_license_leaf)
+        else:
+            update_licenses_relations_infimum_rec(neo_license, object_license, neo_license_leaf, object_license_leaf, already_tested, linked_to)
+    return neo_license
+
+
+def update_licenses_relations_supremum(object_license):
+    license_roots = get_root_licenses()
+    neo_license = NeoFactory.NeoLicense(object_license)
+    neo_license.save()
+    linked_to = []
+    already_tested = [object_license]
+    for neo_license_root in license_roots:
+        object_license_root = ObjectFactory.objectLicense(neo_license_root)
+        if object_license.is_following(object_license_root):
+            if Constraints.is_compatibility_viable(object_license_root, object_license):
+                neo_license_root.followings.connect(neo_license)
+                linked_to.append(object_license_root)
+        else:
+            update_licenses_relations_supremum_rec(neo_license, object_license, neo_license_root, object_license_root, already_tested, linked_to)
+    return neo_license
+
+
+def update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license, object_license, already_tested, linked_to):
     # update precedings and followings of license recursively.
     grand_follower = False
     for neo_license_following in neo_license.followings:
         object_license_following = ObjectFactory.objectLicense(neo_license_following)
-        if new_object_license.is_following(object_license_following):
-            # new license is a follower of a following
-            grand_follower = True
-        if new_object_license.is_preceding(object_license_following):
-            if Constraints.is_compatibility_viable(new_object_license, object_license_following):
-                neo_license_following.precedings.connect(new_neo_license)
-            if new_object_license.is_following(object_license):
-                # new_license is between license and its following_license.
-                if Constraints.is_compatibility_viable(object_license, new_object_license):
-                    neo_license.followings.connect(new_neo_license)
-                    neo_license.followings.disconnect(neo_license_following)
+        if object_license_following not in already_tested:
+            print new_object_license
+            print object_license_following
+            if new_object_license.is_following(object_license_following):
+                # new license is a follower of a following
+                grand_follower = True
+                update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license_following, object_license_following, already_tested, linked_to)
+            elif new_object_license.is_preceding(object_license_following):
+                if Constraints.is_compatibility_viable(new_object_license, object_license_following):
+                    # the license can have been linked in the bottom
+                    # if is_not_already_follower(object_license_following, linked_to):
+                    neo_license_following.precedings.connect(new_neo_license)
+                    linked_to.append(object_license_following)
+                    if new_object_license.is_following(object_license):
+                        neo_license.followings.disconnect(neo_license_following)
+                        neo_license.followings.connect(new_neo_license)
+                        linked_to.append(object_license)
+            else:
+                update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license_following, object_license_following, already_tested, linked_to)
         else:
-            update_licenses_relations_rec(new_neo_license, new_object_license, neo_license_following, object_license_following)
-    if not grand_follower and new_object_license.is_following(object_license):
+            continue
+    if not grand_follower and new_object_license.is_following(object_license) and is_not_already_preceder(object_license, linked_to):
         # then its just the next follower of the current license
         if Constraints.is_compatibility_viable(object_license, new_object_license):
-            neo_license.followings.connect(new_neo_license)
+                neo_license.followings.connect(new_neo_license)
+                linked_to.append(object_license)
+    already_tested.append(object_license)
+
+
+def update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license, object_license, already_tested, linked_to):
+    # update precedings and followings of license recursively.
+    grand_preceder = False
+    for neo_license_preceding in neo_license.precedings:
+        object_license_preceding = ObjectFactory.objectLicense(neo_license_preceding)
+        if object_license_preceding not in already_tested:
+            if new_object_license.is_preceding(object_license_preceding):
+                # new license is a preceder of a preceder
+                grand_preceder = True
+                update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license_preceding, object_license_preceding, already_tested, linked_to)
+            elif new_object_license.is_following(object_license_preceding):
+                if Constraints.is_compatibility_viable(object_license_preceding, new_object_license):
+                    # the license can have been linked in the top
+                    # if is_not_already_preceder(object_license_preceding, linked_to):
+                    neo_license_preceding.followings.connect(new_neo_license)
+                    linked_to.append(object_license_preceding)
+                    if new_object_license.is_preceding(object_license) and Constraints.is_compatibility_viable(new_object_license, object_license):
+                        neo_license.precedings.disconnect(neo_license_preceding)
+                        neo_license.precedings.connect(new_neo_license)
+                        linked_to.append(object_license)
+            else:
+                update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license_preceding, object_license_preceding, already_tested, linked_to)
+        else:
+            continue
+    if not grand_preceder and new_object_license.is_preceding(object_license) and is_not_already_follower(object_license, linked_to):
+        # then its just the next follower of the current license
+        if Constraints.is_compatibility_viable(new_object_license, object_license):
+                neo_license.precedings.connect(new_neo_license)
+                linked_to.append(object_license)
+    already_tested.append(object_license)
+
+
+def is_not_already_follower(object_license, linked_to):
+    for linked_license in linked_to:
+        if object_license.is_following(linked_license):
+            return False
+    return True
+
+
+def is_not_already_preceder(object_license, linked_to):
+    for linked_license in linked_to:
+        if object_license.is_preceding(linked_license):
+            return False
+    return True
+
+
+@need_auth
+def delete_license(request):
+    clear_neo4j_database(db)
+    response = HttpResponse(
+        '',
+        content_type='application/json',
+        status=200,
+    )
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
 @fn_timer

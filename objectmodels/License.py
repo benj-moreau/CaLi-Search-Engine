@@ -116,7 +116,7 @@ class License(object):
 
     def __eq__(self, other):
         """Using label to differentiate licenses."""
-        return isinstance(other, License) and self.label == other.label
+        return isinstance(other, License) and self.__hash__() == other.__hash__()
 
     def __hash__(self):
         """Using Permissions, obligations, prohibitions to differentiate licenses."""
