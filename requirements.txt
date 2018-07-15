@@ -2,3 +2,4 @@ Django==1.8.18
 django_neomodel==0.0.4
 requests==2.18.4
 dj-static==0.0.6
+plotly==3.0.0

@@ -4,6 +4,7 @@ from django.views.decorators.http import require_http_methods
 from neomodel import UniqueProperty, DoesNotExist
 import json
 import random
+import time
 
 from objectmodels.Dataset import Dataset
 from objectmodels.License import License
@@ -15,6 +16,7 @@ from utils.TimerDecorator import fn_timer
 from utils.authentificator import need_auth
 from utils import D3jsData
 from utils import Constraints
+from utils import Plot
 
 
 @require_http_methods(['GET', 'POST', 'DELETE'])
@@ -209,6 +211,41 @@ def is_empty(str_list):
     return False
 
 
+@require_http_methods(['POST'])
+@need_auth
+def add_license_experiment(request):
+    json_licenses = json.loads(request.body)
+    time_array1 = []
+    time_array2 = []
+    # We do not check viability
+    random.shuffle(json_licenses)
+    # Add from the bottom
+    clear_neo4j_database(db)
+    for json_license in json_licenses:
+        object_license = License()
+        object_license.from_json(json_license)
+        t0 = time.time()
+        object_license = add_license_to_db(object_license, method='infimum')
+        t1 = time.time()
+        time_array1.append(str(t1-t0))
+    clear_neo4j_database(db)
+    for json_license in json_licenses:
+        object_license = License()
+        object_license.from_json(json_license)
+        t0 = time.time()
+        object_license = add_license_to_db(object_license, method='supremum')
+        t1 = time.time()
+        time_array2.append(str(t1-t0))
+    Plot.draw(time_array1, time_array2)
+    response = HttpResponse(
+        json.dumps(time_array1),
+        content_type='application/json',
+        status=201,
+    )
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
 @need_auth
 @fn_timer
 def add_license(request):
@@ -236,7 +273,7 @@ def add_license(request):
 
 
 @fn_timer
-def add_license_to_db(object_license):
+def add_license_to_db(object_license, method='infimum'):
     neo_license = LicenseModel.nodes.get_or_none(hashed_sets=object_license.hash())
     if neo_license:
         # update of labels list if needed
@@ -244,8 +281,13 @@ def add_license_to_db(object_license):
         neo_license.save()
     else:
         # license does not exists in db
-        # neo_license = update_licenses_relations_infimum(object_license)
-        neo_license = update_licenses_relations_supremum(object_license)
+        if method == 'infimum':
+            neo_license = update_licenses_relations_infimum(object_license)
+        elif method == 'supremum':
+            neo_license = update_licenses_relations_supremum(object_license)
+        else:
+            # change with mediane method
+            neo_license = update_licenses_relations_supremum(object_license)
     for dataset in object_license.get_datasets():
         neo_dataset = DatasetModel.nodes.get_or_none(hashed_uri=dataset.hash())
         if not neo_dataset:

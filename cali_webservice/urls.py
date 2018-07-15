@@ -18,6 +18,7 @@ from views import base_api, search_engine
 
 urlpatterns = [
     url(r'^api/licenses/graph/?$', base_api.get_graph, name='get_graph'),
+    url(r'^api/licenses/experiment/?$', base_api.add_license_experiment, name='experiment'),
     url(r'^api/licenses/(?P<hashed_sets>[\w_@-]+)/compatible/?$', base_api.get_compatible, name='get_compatible'),
     url(r'^api/licenses/(?P<hashed_sets>[\w_@-]+)/compliant/?$', base_api.get_compliant, name='get_compliant'),
     url(r'^api/licenses/(?P<hashed_sets>[\w_@-]+)/datasets/?$', base_api.get_datasets_of_licenses, name='get_datasets_of_licenses'),
