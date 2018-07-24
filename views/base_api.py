@@ -2,6 +2,7 @@ from django.http.response import HttpResponse
 from django.views.decorators.http import require_http_methods
 
 from neomodel import UniqueProperty, DoesNotExist
+from numpy import median
 import json
 import random
 import time
@@ -17,6 +18,9 @@ from utils.authentificator import need_auth
 from utils import D3jsData
 from utils import Constraints
 from utils import Plot
+from utils import LicenseGenerator
+
+LEVELS_FILE = "license_levels.json"
 
 
 @require_http_methods(['GET', 'POST', 'DELETE'])
@@ -211,34 +215,60 @@ def is_empty(str_list):
     return False
 
 
-@require_http_methods(['POST'])
+@require_http_methods(['GET'])
 @need_auth
 def add_license_experiment(request):
-    json_licenses = json.loads(request.body)
-    time_array1 = []
-    time_array2 = []
+    structure = request.GET.get('structure', 'linear_order')
+    order = request.GET.get('order', 'rand')
+    limit = request.GET.get('limit', 144)
+    measure = request.GET.get('measure', 'time')
+    licenses = LicenseGenerator.generate(structure, order, limit)
+    measure_array_inf = []
+    measure_array_supr = []
+    measure_arry_med = []
     # We do not check viability
-    random.shuffle(json_licenses)
     # Add from the bottom
     clear_neo4j_database(db)
-    for json_license in json_licenses:
-        object_license = License()
-        object_license.from_json(json_license)
+    for object_license in licenses:
+        nb_comp = 0
         t0 = time.time()
-        object_license = add_license_to_db(object_license, method='infimum')
+        object_license, nb_comp = add_license_to_db(object_license, method='infimum', viability_check=False)
         t1 = time.time()
-        time_array1.append(str(t1-t0))
+        if measure == 'time':
+            measure_array_inf.append(str(t1-t0))
+        else:
+            measure_array_inf.append(str(nb_comp))
     clear_neo4j_database(db)
-    for json_license in json_licenses:
-        object_license = License()
-        object_license.from_json(json_license)
+    # Add from the top
+    for object_license in licenses:
         t0 = time.time()
-        object_license = add_license_to_db(object_license, method='supremum')
+        object_license, nb_comp = add_license_to_db(object_license, method='supremum', viability_check=False)
         t1 = time.time()
-        time_array2.append(str(t1-t0))
-    Plot.draw(time_array1, time_array2)
+        if measure == 'time':
+            measure_array_supr.append(str(t1-t0))
+        else:
+            measure_array_supr.append(str(nb_comp))
+    clear_neo4j_database(db)
+    # add using median
+    license_levels = []
+    level_median = 0
+    for object_license in licenses:
+        license_level = object_license.get_level()
+        t0 = time.time()
+        if license_levels:
+            level_median = median(license_levels)
+        if license_level > level_median:
+            object_license, nb_comp = add_license_to_db(object_license, method='supremum', license_levels=license_levels, viability_check=False)
+        else:
+            object_license, nb_comp = add_license_to_db(object_license, method='infimum', license_levels=license_levels, viability_check=False)
+        t1 = time.time()
+        if measure == 'time':
+            measure_arry_med.append(str(t1-t0))
+        else:
+            measure_arry_med.append(str(nb_comp))
+    # clear_neo4j_database(db)
+    Plot.draw(measure_array_inf, measure_array_supr, measure_arry_med, structure, order, limit, measure)
     response = HttpResponse(
-        json.dumps(time_array1),
         content_type='application/json',
         status=201,
     )
@@ -252,17 +282,31 @@ def add_license(request):
     json_licenses = json.loads(request.body)
     added_licenses = []
     random.shuffle(json_licenses)
+    license_levels = []
+    level_median = 0
+    try:
+        with open(LEVELS_FILE, 'r') as f:
+            license_levels = json.load(f)
+    except IOError:
+        pass
     for json_license in json_licenses:
         object_license = License()
         object_license.from_json(json_license)
         if object_license.contains_only_odrl_actions():
             if Constraints.is_license_viable(object_license):
-                object_license = add_license_to_db(object_license)
+                if license_levels:
+                    level_median = median(license_levels)
+                if object_license.get_level() > level_median:
+                    object_license, nb_comparisons = add_license_to_db(object_license, method='supremum', license_levels=license_levels)
+                else:
+                    object_license, nb_comparisons = add_license_to_db(object_license, method='infimum', license_levels=license_levels)
                 added_licenses.append(object_license.to_json())
             else:
                 added_licenses.append("Not a valid license: License is non-viable")
         else:
             added_licenses.append("Not a valid license: Use only ODRL actions")
+    with open(LEVELS_FILE, 'w') as outfile:
+        json.dump(license_levels, outfile)
     response = HttpResponse(
         json.dumps(added_licenses),
         content_type='application/json',
@@ -273,7 +317,7 @@ def add_license(request):
 
 
 @fn_timer
-def add_license_to_db(object_license, method='infimum'):
+def add_license_to_db(object_license, method='infimum', license_levels=[], viability_check=True, nb_comparisons=0):
     neo_license = LicenseModel.nodes.get_or_none(hashed_sets=object_license.hash())
     if neo_license:
         # update of labels list if needed
@@ -282,12 +326,10 @@ def add_license_to_db(object_license, method='infimum'):
     else:
         # license does not exists in db
         if method == 'infimum':
-            neo_license = update_licenses_relations_infimum(object_license)
-        elif method == 'supremum':
-            neo_license = update_licenses_relations_supremum(object_license)
+            neo_license, nb_comparisons = update_licenses_relations_infimum(object_license, viability_check, nb_comparisons)
         else:
-            # change with mediane method
-            neo_license = update_licenses_relations_supremum(object_license)
+            neo_license, nb_comparisons = update_licenses_relations_supremum(object_license, viability_check, nb_comparisons)
+        license_levels.append(object_license.get_level())
     for dataset in object_license.get_datasets():
         neo_dataset = DatasetModel.nodes.get_or_none(hashed_uri=dataset.hash())
         if not neo_dataset:
@@ -295,10 +337,10 @@ def add_license_to_db(object_license, method='infimum'):
             neo_dataset.save()
         neo_license.datasets.connect(neo_dataset)
     object_license = ObjectFactory.objectLicense(neo_license)
-    return object_license
+    return object_license, nb_comparisons
 
 
-def update_licenses_relations_infimum(object_license):
+def update_licenses_relations_infimum(object_license, viability_check, nb_comparisons):
     license_leaves = get_leaf_licenses()
     neo_license = NeoFactory.NeoLicense(object_license)
     neo_license.save()
@@ -307,15 +349,16 @@ def update_licenses_relations_infimum(object_license):
     for neo_license_leaf in license_leaves:
         object_license_leaf = ObjectFactory.objectLicense(neo_license_leaf)
         if object_license.is_preceding(object_license_leaf):
-            if Constraints.is_compatibility_viable(object_license, object_license_leaf):
+            nb_comparisons += 1
+            if Constraints.is_compatibility_viable(object_license, object_license_leaf) or not viability_check:
                 neo_license_leaf.precedings.connect(neo_license)
                 linked_to.append(object_license_leaf)
         else:
-            update_licenses_relations_infimum_rec(neo_license, object_license, neo_license_leaf, object_license_leaf, already_tested, linked_to)
-    return neo_license
+            nb_comparisons = update_licenses_relations_infimum_rec(neo_license, object_license, neo_license_leaf, object_license_leaf, already_tested, linked_to, viability_check, nb_comparisons)
+    return neo_license, nb_comparisons
 
 
-def update_licenses_relations_supremum(object_license):
+def update_licenses_relations_supremum(object_license, viability_check, nb_comparisons):
     license_roots = get_root_licenses()
     neo_license = NeoFactory.NeoLicense(object_license)
     neo_license.save()
@@ -324,78 +367,89 @@ def update_licenses_relations_supremum(object_license):
     for neo_license_root in license_roots:
         object_license_root = ObjectFactory.objectLicense(neo_license_root)
         if object_license.is_following(object_license_root):
-            if Constraints.is_compatibility_viable(object_license_root, object_license):
+            nb_comparisons += 1
+            if Constraints.is_compatibility_viable(object_license_root, object_license) or not viability_check:
                 neo_license_root.followings.connect(neo_license)
                 linked_to.append(object_license_root)
         else:
-            update_licenses_relations_supremum_rec(neo_license, object_license, neo_license_root, object_license_root, already_tested, linked_to)
-    return neo_license
+            nb_comparisons = update_licenses_relations_supremum_rec(neo_license, object_license, neo_license_root, object_license_root, already_tested, linked_to, viability_check, nb_comparisons)
+    return neo_license, nb_comparisons
 
 
-def update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license, object_license, already_tested, linked_to):
+def update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license, object_license, already_tested, linked_to, viability_check, nb_comparisons):
     # update precedings and followings of license recursively.
     grand_follower = False
     for neo_license_following in neo_license.followings:
         object_license_following = ObjectFactory.objectLicense(neo_license_following)
         if object_license_following not in already_tested:
-            print new_object_license
-            print object_license_following
             if new_object_license.is_following(object_license_following):
+                nb_comparisons += 1
                 # new license is a follower of a following
                 grand_follower = True
-                update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license_following, object_license_following, already_tested, linked_to)
+                nb_comparisons = update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license_following, object_license_following, already_tested, linked_to, viability_check, nb_comparisons)
             elif new_object_license.is_preceding(object_license_following):
-                if Constraints.is_compatibility_viable(new_object_license, object_license_following):
+                nb_comparisons += 2
+                if Constraints.is_compatibility_viable(new_object_license, object_license_following) or not viability_check:
                     # the license can have been linked in the bottom
                     # if is_not_already_follower(object_license_following, linked_to):
                     neo_license_following.precedings.connect(new_neo_license)
                     linked_to.append(object_license_following)
-                    if new_object_license.is_following(object_license):
+                    nb_comparisons += 1
+                    if new_object_license.is_following(object_license) and (Constraints.is_compatibility_viable(object_license, new_object_license) or not viability_check):
                         neo_license.followings.disconnect(neo_license_following)
                         neo_license.followings.connect(new_neo_license)
                         linked_to.append(object_license)
             else:
-                update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license_following, object_license_following, already_tested, linked_to)
+                nb_comparisons += 2
+                nb_comparisons = update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license_following, object_license_following, already_tested, linked_to, viability_check, nb_comparisons)
         else:
             continue
+    nb_comparisons += 1
     if not grand_follower and new_object_license.is_following(object_license) and is_not_already_preceder(object_license, linked_to):
         # then its just the next follower of the current license
-        if Constraints.is_compatibility_viable(object_license, new_object_license):
+        if Constraints.is_compatibility_viable(object_license, new_object_license) or not viability_check:
                 neo_license.followings.connect(new_neo_license)
                 linked_to.append(object_license)
     already_tested.append(object_license)
+    return nb_comparisons
 
 
-def update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license, object_license, already_tested, linked_to):
+def update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license, object_license, already_tested, linked_to, viability_check, nb_comparisons):
     # update precedings and followings of license recursively.
     grand_preceder = False
     for neo_license_preceding in neo_license.precedings:
         object_license_preceding = ObjectFactory.objectLicense(neo_license_preceding)
         if object_license_preceding not in already_tested:
             if new_object_license.is_preceding(object_license_preceding):
+                nb_comparisons += 1
                 # new license is a preceder of a preceder
                 grand_preceder = True
-                update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license_preceding, object_license_preceding, already_tested, linked_to)
+                nb_comparisons = update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license_preceding, object_license_preceding, already_tested, linked_to, viability_check, nb_comparisons)
             elif new_object_license.is_following(object_license_preceding):
-                if Constraints.is_compatibility_viable(object_license_preceding, new_object_license):
+                nb_comparisons += 2
+                if Constraints.is_compatibility_viable(object_license_preceding, new_object_license) or not viability_check:
                     # the license can have been linked in the top
                     # if is_not_already_preceder(object_license_preceding, linked_to):
                     neo_license_preceding.followings.connect(new_neo_license)
                     linked_to.append(object_license_preceding)
-                    if new_object_license.is_preceding(object_license) and Constraints.is_compatibility_viable(new_object_license, object_license):
+                    nb_comparisons += 1
+                    if new_object_license.is_preceding(object_license) and (Constraints.is_compatibility_viable(new_object_license, object_license) or not viability_check):
                         neo_license.precedings.disconnect(neo_license_preceding)
                         neo_license.precedings.connect(new_neo_license)
                         linked_to.append(object_license)
             else:
-                update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license_preceding, object_license_preceding, already_tested, linked_to)
+                nb_comparisons += 2
+                nb_comparisons = update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license_preceding, object_license_preceding, already_tested, linked_to, viability_check, nb_comparisons)
         else:
             continue
+    nb_comparisons += 1
     if not grand_preceder and new_object_license.is_preceding(object_license) and is_not_already_follower(object_license, linked_to):
         # then its just the next follower of the current license
-        if Constraints.is_compatibility_viable(new_object_license, object_license):
+        if Constraints.is_compatibility_viable(new_object_license, object_license) or not viability_check:
                 neo_license.precedings.connect(new_neo_license)
                 linked_to.append(object_license)
     already_tested.append(object_license)
+    return nb_comparisons
 
 
 def is_not_already_follower(object_license, linked_to):
@@ -415,6 +469,11 @@ def is_not_already_preceder(object_license, linked_to):
 @need_auth
 def delete_license(request):
     clear_neo4j_database(db)
+    try:
+        with open(LEVELS_FILE, 'w') as outfile:
+            json.dump([], outfile)
+    except IOError:
+        pass
     response = HttpResponse(
         '',
         content_type='application/json',

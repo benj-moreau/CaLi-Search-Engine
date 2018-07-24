@@ -120,7 +120,7 @@ class License(object):
 
     def __hash__(self):
         """Using Permissions, obligations, prohibitions to differentiate licenses."""
-        return str(hash(self.permissions) + hash(self.obligations) + hash(self.prohibitions))
+        return "{}{}{}".format(hash(self.permissions), hash(self.obligations), hash(self.prohibitions))
 
     def __repr__(self):
         """Using label to print licenses."""
