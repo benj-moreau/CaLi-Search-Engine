@@ -220,7 +220,7 @@ def is_empty(str_list):
 def add_license_experiment(request):
     structure = request.GET.get('structure', 'linear_order')
     order = request.GET.get('order', 'rand')
-    limit = request.GET.get('limit', 144)
+    limit = int(request.GET.get('limit', '144'))
     measure = request.GET.get('measure', 'time')
     licenses = LicenseGenerator.generate(structure, order, limit)
     measure_array_inf = []

@@ -36,19 +36,21 @@ def _linear_order(licenses, limit=144):
     licenses[-1].set_labels([str(label)])
     # obligations
     for action in ODRL.ACTIONS:
-        label += 1
-        obligations.append(action)
-        licenses.append(License())
-        licenses[-1].set_labels([str(label)])
-        licenses[-1].set_obligations(frozenset(obligations))
+        if len(licenses) < limit:
+            label += 1
+            obligations.append(action)
+            licenses.append(License())
+            licenses[-1].set_labels([str(label)])
+            licenses[-1].set_obligations(frozenset(obligations))
     # prohibitions
     for action in ODRL.ACTIONS:
-        label += 1
-        prohibitions.append(action)
-        licenses.append(License())
-        licenses[-1].set_labels([str(label)])
-        licenses[-1].set_obligations(frozenset(obligations))
-        licenses[-1].set_prohibitions(frozenset(prohibitions))
+        if len(licenses) < limit:
+            label += 1
+            prohibitions.append(action)
+            licenses.append(License())
+            licenses[-1].set_labels([str(label)])
+            licenses[-1].set_obligations(frozenset(obligations))
+            licenses[-1].set_prohibitions(frozenset(prohibitions))
 
 
 def _no_order(licenses, limit=144):
@@ -57,22 +59,24 @@ def _no_order(licenses, limit=144):
         limit = 144
     label = 0
     for action in ODRL.ACTIONS:
-        licenses.append(License())
-        licenses[-1].set_labels([str(label)])
-        licenses[-1].set_obligations(frozenset([action]))
-        label += 1
+        if len(licenses) < limit:
+            licenses.append(License())
+            licenses[-1].set_labels([str(label)])
+            licenses[-1].set_obligations(frozenset([action]))
+            label += 1
     for action in ODRL.ACTIONS:
-        licenses.append(License())
-        licenses[-1].set_labels([str(label)])
-        licenses[-1].set_prohibitions(frozenset([action]))
-        label += 1
+        if len(licenses) < limit:
+            licenses.append(License())
+            licenses[-1].set_labels([str(label)])
+            licenses[-1].set_prohibitions(frozenset([action]))
+            label += 1
 
 
 def _partial_order(licenses, limit=144):
     if limit > 1000000000:
         limit = 1000000000
     label = 0
-    while label < limit:
+    while len(licenses) < limit:
         license = _random_license(label)
         if license not in licenses:
             licenses.append(license)

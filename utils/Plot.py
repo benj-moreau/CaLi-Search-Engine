@@ -6,27 +6,39 @@ def draw(measure_array_inf, measure_array_sup, measure_array_med, structure, ord
     trace_infimum = go.Scatter(
         x=range(len(measure_array_inf)),
         y=measure_array_inf,
-        name='Infimum'
+        name='Infimum',
+        line=dict(
+            color=('rgb(169, 203, 160)'),
+            width=2,
+            dash='dash'
+        )
     )
     trace_supremum = go.Scatter(
         x=range(len(measure_array_sup)),
         y=measure_array_sup,
-        name='Supremum'
+        name='Supremum',
+        line=dict(
+            color=('rgb(60, 84, 206)'),
+            width=2,
+            dash='dot'
+        )
     )
     trace_median = go.Scatter(
         x=range(len(measure_array_med)),
         y=measure_array_med,
-        name='Median'
+        name='Median',
+        line=dict(
+            color=('rgb(205, 12, 24)'),
+            width=3
+        )
     )
     data = [trace_infimum, trace_supremum, trace_median]
     if measure == 'time':
-        plot_title = 'Average time to add a license in the graph'
         y_title = 'Execution time (ms)'
     else:
-        plot_title = 'Number of comparisons to add a license in the graph'
-        y_title = 'Number of comparisons (nodes)'
-    layout = dict(title=plot_title,
-                  xaxis=dict(title='Graph size (nodes)'),
+        y_title = 'Number of comparisons'
+    layout = dict(
+                  xaxis=dict(title='Number of nodes'),
                   yaxis=dict(title=y_title)
                   )
     fig = dict(data=data, layout=layout)
