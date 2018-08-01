@@ -109,21 +109,25 @@ class License(object):
         return True
 
     def repr_terms(self):
-        """Using Permissions, obligations, prohibitions to print licence."""
+        """Use Permissions, obligations, prohibitions to print licence."""
         return "Permissions:{}, Obligations:{}, Prohibitions:{}".format(list(self.permissions),
                                                                         list(self.obligations),
                                                                         list(self.prohibitions))
 
     def __eq__(self, other):
-        """Using label to differentiate licenses."""
+        """Use sets hash to differentiate licenses."""
         return isinstance(other, License) and self.__hash__() == other.__hash__()
 
+    def __ne__(self, other):
+        """Use sets hash to differentiate licenses."""
+        return not self.__eq__(other)
+
     def __hash__(self):
-        """Using Permissions, obligations, prohibitions to differentiate licenses."""
+        """Use Permissions, obligations, prohibitions to differentiate licenses."""
         return "{}{}{}".format(hash(self.permissions), hash(self.obligations), hash(self.prohibitions))
 
     def __repr__(self):
-        """Using label to print licenses."""
+        """Use label to print licenses."""
         labels = self.get_labels()
         license_label = ""
         for i, label in enumerate(labels):
@@ -134,5 +138,5 @@ class License(object):
         return license_label
 
     def __str__(self):
-        """Using label to print licenses."""
+        """Use label to print licenses."""
         return self.__repr__()

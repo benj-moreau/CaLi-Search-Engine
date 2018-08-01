@@ -341,129 +341,121 @@ def add_license_to_db(object_license, method='infimum', license_levels=[], viabi
 
 
 def update_licenses_relations_infimum(object_license, viability_check, nb_comparisons):
+    tested_licenses = [object_license]
     license_leaves = get_leaf_licenses()
     neo_license = NeoFactory.NeoLicense(object_license)
     neo_license.save()
-    linked_to = []
-    already_tested = [object_license]
     for neo_license_leaf in license_leaves:
         object_license_leaf = ObjectFactory.objectLicense(neo_license_leaf)
-        if object_license.is_preceding(object_license_leaf):
-            nb_comparisons += 1
-            if Constraints.is_compatibility_viable(object_license, object_license_leaf) or not viability_check:
-                neo_license_leaf.precedings.connect(neo_license)
-                linked_to.append(object_license_leaf)
+        nb_comparisons += 1
+        if object_license.is_preceding(object_license_leaf) and (Constraints.is_compatibility_viable(object_license, object_license_leaf) or not viability_check):
+            update_transitivity_follower(neo_license, object_license_leaf)
+            neo_license_leaf.precedings.connect(neo_license)
         else:
-            nb_comparisons = update_licenses_relations_infimum_rec(neo_license, object_license, neo_license_leaf, object_license_leaf, already_tested, linked_to, viability_check, nb_comparisons)
+            nb_comparisons = update_licenses_relations_infimum_rec(neo_license, object_license, neo_license_leaf, object_license_leaf, viability_check, nb_comparisons, tested_licenses)
     return neo_license, nb_comparisons
 
 
 def update_licenses_relations_supremum(object_license, viability_check, nb_comparisons):
+    tested_licenses = [object_license]
     license_roots = get_root_licenses()
     neo_license = NeoFactory.NeoLicense(object_license)
     neo_license.save()
-    linked_to = []
-    already_tested = [object_license]
     for neo_license_root in license_roots:
         object_license_root = ObjectFactory.objectLicense(neo_license_root)
-        if object_license.is_following(object_license_root):
-            nb_comparisons += 1
-            if Constraints.is_compatibility_viable(object_license_root, object_license) or not viability_check:
-                neo_license_root.followings.connect(neo_license)
-                linked_to.append(object_license_root)
+        nb_comparisons += 1
+        if object_license.is_following(object_license_root) and (Constraints.is_compatibility_viable(object_license_root, object_license) or not viability_check):
+            update_transitivity_preceder(neo_license, object_license_root)
+            neo_license_root.followings.connect(neo_license)
         else:
-            nb_comparisons = update_licenses_relations_supremum_rec(neo_license, object_license, neo_license_root, object_license_root, already_tested, linked_to, viability_check, nb_comparisons)
+            nb_comparisons = update_licenses_relations_supremum_rec(neo_license, object_license, neo_license_root, object_license_root, viability_check, nb_comparisons, tested_licenses)
     return neo_license, nb_comparisons
 
 
-def update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license, object_license, already_tested, linked_to, viability_check, nb_comparisons):
+def update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license, object_license, viability_check, nb_comparisons, tested_licenses):
     # update precedings and followings of license recursively.
+    if object_license in tested_licenses:
+        return nb_comparisons
+    tested_licenses.append(object_license)
     grand_follower = False
     for neo_license_following in neo_license.followings:
         object_license_following = ObjectFactory.objectLicense(neo_license_following)
-        if object_license_following not in already_tested:
-            if new_object_license.is_following(object_license_following):
-                nb_comparisons += 1
-                # new license is a follower of a following
-                grand_follower = True
-                nb_comparisons = update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license_following, object_license_following, already_tested, linked_to, viability_check, nb_comparisons)
-            elif new_object_license.is_preceding(object_license_following):
-                nb_comparisons += 2
-                if Constraints.is_compatibility_viable(new_object_license, object_license_following) or not viability_check:
-                    # the license can have been linked in the bottom
-                    # if is_not_already_follower(object_license_following, linked_to):
-                    neo_license_following.precedings.connect(new_neo_license)
-                    linked_to.append(object_license_following)
-                    nb_comparisons += 1
-                    if new_object_license.is_following(object_license) and (Constraints.is_compatibility_viable(object_license, new_object_license) or not viability_check):
-                        neo_license.followings.disconnect(neo_license_following)
-                        neo_license.followings.connect(new_neo_license)
-                        linked_to.append(object_license)
-            else:
-                nb_comparisons += 2
-                nb_comparisons = update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license_following, object_license_following, already_tested, linked_to, viability_check, nb_comparisons)
-        else:
+        if already_follower(object_license_following, new_neo_license):
             continue
+        nb_comparisons += 1
+        if new_object_license.is_preceding(object_license_following) and (Constraints.is_compatibility_viable(new_object_license, object_license_following) or not viability_check):
+            update_transitivity_follower(new_neo_license, object_license_following)
+            new_neo_license.followings.connect(neo_license_following)
+            if new_object_license.is_following(object_license) and (Constraints.is_compatibility_viable(object_license, new_object_license) or not viability_check):
+                new_neo_license.precedings.connect(neo_license)
+                neo_license.followings.disconnect(neo_license_following)
+        else:
+            nb_comparisons += 1
+            if new_object_license.is_following(object_license_following) and (Constraints.is_compatibility_viable(object_license_following, new_object_license) or not viability_check):
+                grand_follower = True
+            nb_comparisons = update_licenses_relations_infimum_rec(new_neo_license, new_object_license, neo_license_following, object_license_following, viability_check, nb_comparisons, tested_licenses)
     nb_comparisons += 1
-    if not grand_follower and new_object_license.is_following(object_license) and is_not_already_preceder(object_license, linked_to):
-        # then its just the next follower of the current license
-        if Constraints.is_compatibility_viable(object_license, new_object_license) or not viability_check:
-                neo_license.followings.connect(new_neo_license)
-                linked_to.append(object_license)
-    already_tested.append(object_license)
+    if not grand_follower and (new_object_license.is_following(object_license) and (Constraints.is_compatibility_viable(object_license, new_object_license) or not viability_check)):
+        new_neo_license.precedings.connect(neo_license)
     return nb_comparisons
 
 
-def update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license, object_license, already_tested, linked_to, viability_check, nb_comparisons):
+def update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license, object_license, viability_check, nb_comparisons, tested_licenses):
     # update precedings and followings of license recursively.
+    if object_license in tested_licenses:
+        return nb_comparisons
+    tested_licenses.append(object_license)
     grand_preceder = False
     for neo_license_preceding in neo_license.precedings:
         object_license_preceding = ObjectFactory.objectLicense(neo_license_preceding)
-        if object_license_preceding not in already_tested:
-            if new_object_license.is_preceding(object_license_preceding):
-                nb_comparisons += 1
-                # new license is a preceder of a preceder
-                grand_preceder = True
-                nb_comparisons = update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license_preceding, object_license_preceding, already_tested, linked_to, viability_check, nb_comparisons)
-            elif new_object_license.is_following(object_license_preceding):
-                nb_comparisons += 2
-                if Constraints.is_compatibility_viable(object_license_preceding, new_object_license) or not viability_check:
-                    # the license can have been linked in the top
-                    # if is_not_already_preceder(object_license_preceding, linked_to):
-                    neo_license_preceding.followings.connect(new_neo_license)
-                    linked_to.append(object_license_preceding)
-                    nb_comparisons += 1
-                    if new_object_license.is_preceding(object_license) and (Constraints.is_compatibility_viable(new_object_license, object_license) or not viability_check):
-                        neo_license.precedings.disconnect(neo_license_preceding)
-                        neo_license.precedings.connect(new_neo_license)
-                        linked_to.append(object_license)
-            else:
-                nb_comparisons += 2
-                nb_comparisons = update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license_preceding, object_license_preceding, already_tested, linked_to, viability_check, nb_comparisons)
-        else:
+        if already_preceder(object_license_preceding, new_neo_license):
             continue
+        nb_comparisons += 1
+        if new_object_license.is_following(object_license_preceding) and (Constraints.is_compatibility_viable(object_license_preceding, new_object_license) or not viability_check):
+            update_transitivity_preceder(new_neo_license, object_license_preceding)
+            new_neo_license.precedings.connect(neo_license_preceding)
+            if new_object_license.is_preceding(object_license) and (Constraints.is_compatibility_viable(new_object_license, object_license) or not viability_check):
+                new_neo_license.followings.connect(neo_license)
+                neo_license.precedings.disconnect(neo_license_preceding)
+        else:
+            nb_comparisons += 1
+            if new_object_license.is_preceding(object_license_preceding) and (Constraints.is_compatibility_viable(new_object_license, object_license_preceding) or not viability_check):
+                grand_preceder = True
+            nb_comparisons = update_licenses_relations_supremum_rec(new_neo_license, new_object_license, neo_license_preceding, object_license_preceding, viability_check, nb_comparisons, tested_licenses)
     nb_comparisons += 1
-    if not grand_preceder and new_object_license.is_preceding(object_license) and is_not_already_follower(object_license, linked_to):
-        # then its just the next follower of the current license
-        if Constraints.is_compatibility_viable(new_object_license, object_license) or not viability_check:
-                neo_license.precedings.connect(new_neo_license)
-                linked_to.append(object_license)
-    already_tested.append(object_license)
+    if not grand_preceder and (new_object_license.is_preceding(object_license) and (Constraints.is_compatibility_viable(new_object_license, object_license) or not viability_check)):
+        new_neo_license.followings.connect(neo_license)
     return nb_comparisons
 
 
-def is_not_already_follower(object_license, linked_to):
-    for linked_license in linked_to:
-        if object_license.is_following(linked_license):
-            return False
-    return True
+def already_follower(object_license, new_neo_license):
+    for neo_follower in new_neo_license.followings:
+        object_follower = ObjectFactory.objectLicense(neo_follower)
+        if object_license != object_follower and object_license.is_following(object_follower):
+            return True
+    return False
 
 
-def is_not_already_preceder(object_license, linked_to):
-    for linked_license in linked_to:
-        if object_license.is_preceding(linked_license):
-            return False
-    return True
+def already_preceder(object_license, new_neo_license):
+    for neo_preceder in new_neo_license.precedings:
+        object_preceder = ObjectFactory.objectLicense(neo_preceder)
+        if object_license != object_preceder and object_license.is_preceding(object_preceder):
+            return True
+    return False
+
+
+def update_transitivity_follower(new_neo_license, new_object_follower):
+    for neo_follower in new_neo_license.followings:
+        object_follower = ObjectFactory.objectLicense(neo_follower)
+        if object_follower.is_following(new_object_follower):
+            new_neo_license.followings.disconnect(neo_follower)
+
+
+def update_transitivity_preceder(new_neo_license, new_object_preceder):
+    for neo_preceder in new_neo_license.precedings:
+        object_preceder = ObjectFactory.objectLicense(neo_preceder)
+        if object_preceder.is_preceding(new_object_preceder):
+            new_neo_license.precedings.disconnect(neo_preceder)
 
 
 @need_auth
