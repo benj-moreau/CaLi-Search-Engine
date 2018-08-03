@@ -36,7 +36,7 @@ def draw(measure_array_inf, measure_array_sup, measure_array_med, structure, ord
     if measure == 'time':
         y_title = 'Execution time (ms)'
     else:
-        y_title = 'Number of comparisons'
+        y_title = 'Number of visited nodes'
     layout = dict(
                   xaxis=dict(title='Number of nodes'),
                   yaxis=dict(title=y_title)

@@ -1,8 +1,14 @@
 import random
 from operator import methodcaller
+from numpy.random import choice
 
 import utils.ODRL as ODRL
 from objectmodels.License import License
+
+# Weights are calculated from http://purl.org/NET/rdflicense (probability to find an ation in a random license)
+ODRL_WEIGHTS = [0.15, 0.08, 0.07, 0.08, 0.15, 0.09, 0.06, 0.03, 0.0003, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.2, 0.001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.01, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0005, 0.0006, 0.07, 0.002, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]
+
+SET_SIZE_WEIGHTS = [0.025, 0.025, 0.025, 0.025, 0.05, 0.2, 0.3, 0.2, 0.05, 0.025, 0.025, 0.025, 0.025]
 
 
 # Generate a set of licenses using ODRL vocabulary.
@@ -87,10 +93,13 @@ def _partial_order(licenses, limit=144):
 def _random_license(label):
     license = License()
     license.set_labels([str(label)])
-    nb_permissions = random.randint(0, len(ODRL.ACTIONS[:10])-1)
-    nb_obligations = random.randint(0, len(ODRL.ACTIONS[:10])-1)
-    nb_prohibitions = random.randint(0, len(ODRL.ACTIONS[:10])-1)
-    license.set_permissions(frozenset(random.sample(ODRL.ACTIONS[:10], nb_permissions)))
-    license.set_obligations(frozenset(random.sample(ODRL.ACTIONS[:10], nb_obligations)))
-    license.set_prohibitions(frozenset(random.sample(ODRL.ACTIONS[:10], nb_prohibitions)))
+    license.set_permissions(frozenset(_generate_set()))
+    license.set_obligations(frozenset(_generate_set()))
+    license.set_prohibitions(frozenset(_generate_set()))
     return license
+
+
+def _generate_set():
+    set_size = choice(len(SET_SIZE_WEIGHTS), size=1, replace=True, p=SET_SIZE_WEIGHTS)[0]
+    print set_size
+    return choice(ODRL.ACTIONS, size=set_size, replace=False, p=ODRL_WEIGHTS)
