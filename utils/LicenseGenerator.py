@@ -101,5 +101,4 @@ def _random_license(label):
 
 def _generate_set():
     set_size = choice(len(SET_SIZE_WEIGHTS), size=1, replace=True, p=SET_SIZE_WEIGHTS)[0]
-    print set_size
     return choice(ODRL.ACTIONS, size=set_size, replace=False, p=ODRL_WEIGHTS)

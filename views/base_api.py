@@ -222,51 +222,56 @@ def add_license_experiment(request):
     order = request.GET.get('order', 'rand')
     limit = int(request.GET.get('limit', '144'))
     measure = request.GET.get('measure', 'time')
-    licenses = LicenseGenerator.generate(structure, order, limit)
-    measure_array_inf = []
-    measure_array_supr = []
-    measure_arry_med = []
+    nb_exec = int(request.GET.get('executions', '1'))
+    measure_array_inf = {}
+    measure_array_supr = {}
+    measure_arry_med = {}
     # We do not check viability
     # Add from the bottom
     clear_neo4j_database(db)
-    for object_license in licenses:
-        t0 = time.time()
-        object_license, nb_visit = add_license_to_db(object_license, method='infimum', viability_check=False)
-        t1 = time.time()
-        if measure == 'time':
-            measure_array_inf.append(str(t1-t0))
-        else:
-            measure_array_inf.append(str(nb_visit))
-    clear_neo4j_database(db)
-    # Add from the top
-    for object_license in licenses:
-        t0 = time.time()
-        object_license, nb_visit = add_license_to_db(object_license, method='supremum', viability_check=False)
-        t1 = time.time()
-        if measure == 'time':
-            measure_array_supr.append(str(t1-t0))
-        else:
-            measure_array_supr.append(str(nb_visit))
-    clear_neo4j_database(db)
-    # add using median
-    license_levels = []
-    level_median = 0
-    for object_license in licenses:
-        license_level = object_license.get_level()
-        t0 = time.time()
-        if license_levels:
-            level_median = median(license_levels)
-        if license_level > level_median:
-            object_license, nb_visit = add_license_to_db(object_license, method='supremum', license_levels=license_levels, viability_check=False)
-        else:
-            object_license, nb_visit = add_license_to_db(object_license, method='infimum', license_levels=license_levels, viability_check=False)
-        t1 = time.time()
-        if measure == 'time':
-            measure_arry_med.append(str(t1-t0))
-        else:
-            measure_arry_med.append(str(nb_visit))
-    # clear_neo4j_database(db)
-    Plot.draw(measure_array_inf, measure_array_supr, measure_arry_med, structure, order, limit, measure)
+    for i in range(0, nb_exec):
+        licenses = LicenseGenerator.generate(structure, order, limit)
+        measure_array_inf[i] = []
+        for object_license in licenses:
+            t0 = time.time()
+            object_license, nb_visit = add_license_to_db(object_license, method='infimum', viability_check=False)
+            t1 = time.time()
+            if measure == 'time':
+                measure_array_inf[i].append(t1-t0)
+            else:
+                measure_array_inf[i].append(nb_visit)
+        clear_neo4j_database(db)
+        # Add from the top
+        measure_array_supr[i] = []
+        for object_license in licenses:
+            t0 = time.time()
+            object_license, nb_visit = add_license_to_db(object_license, method='supremum', viability_check=False)
+            t1 = time.time()
+            if measure == 'time':
+                measure_array_supr[i].append(t1-t0)
+            else:
+                measure_array_supr[i].append(nb_visit)
+        clear_neo4j_database(db)
+        # from median
+        license_levels = []
+        level_median = 0
+        measure_arry_med[i] = []
+        for object_license in licenses:
+            license_level = object_license.get_level()
+            t0 = time.time()
+            if license_levels:
+                level_median = median(license_levels)
+            if license_level > level_median:
+                object_license, nb_visit = add_license_to_db(object_license, method='supremum', license_levels=license_levels, viability_check=False)
+            else:
+                object_license, nb_visit = add_license_to_db(object_license, method='infimum', license_levels=license_levels, viability_check=False)
+            t1 = time.time()
+            if measure == 'time':
+                measure_arry_med[i].append(t1-t0)
+            else:
+                measure_arry_med[i].append(nb_visit)
+        clear_neo4j_database(db)
+    Plot.draw(measure_array_inf, measure_array_supr, measure_arry_med, structure, order, limit, measure, nb_exec)
     response = HttpResponse(
         content_type='application/json',
         status=201,
