@@ -6,9 +6,9 @@ import utils.ODRL as ODRL
 from objectmodels.License import License
 
 # Weights are calculated from http://purl.org/NET/rdflicense (probability to find an ation in a random license)
-ODRL_WEIGHTS = [0.15, 0.08, 0.07, 0.08, 0.15, 0.09, 0.06, 0.03, 0.0003, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.2, 0.001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.01, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0005, 0.0006, 0.07, 0.002, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 0.0001]
+ODRL_WEIGHTS = [0.15, 0.29, 0.14, 0.09, 0.15, 0.09, 0.09]
 
-SET_SIZE_WEIGHTS = [0.025, 0.025, 0.025, 0.025, 0.05, 0.2, 0.3, 0.2, 0.05, 0.025, 0.025, 0.025, 0.025]
+SET_SIZE_WEIGHTS = [0.05, 0.1, 0.2, 0.3, 0.2, 0.1, 0.05]
 
 
 # Generate a set of licenses using ODRL vocabulary.
@@ -100,5 +100,6 @@ def _random_license(label):
 
 
 def _generate_set():
+    # print sum(ODRL_WEIGHTS)
     set_size = choice(len(SET_SIZE_WEIGHTS), size=1, replace=True, p=SET_SIZE_WEIGHTS)[0]
-    return choice(ODRL.ACTIONS, size=set_size, replace=False, p=ODRL_WEIGHTS)
+    return choice(ODRL.ACTIONS[:len(ODRL_WEIGHTS)], size=set_size, replace=False, p=ODRL_WEIGHTS)
