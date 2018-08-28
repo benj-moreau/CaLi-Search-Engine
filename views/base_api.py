@@ -223,6 +223,7 @@ def add_license_experiment(request):
     limit = int(request.GET.get('limit', '144'))
     measure = request.GET.get('measure', 'time')
     nb_exec = int(request.GET.get('executions', '1'))
+    aggregate = int(request.GET.get('aggregate', '2'))
     measure_array_inf = {}
     measure_array_supr = {}
     measure_arry_med = {}
@@ -271,7 +272,7 @@ def add_license_experiment(request):
             else:
                 measure_arry_med[i].append(nb_visit)
         clear_neo4j_database(db)
-    Plot.draw(measure_array_inf, measure_array_supr, measure_arry_med, structure, order, limit, measure, nb_exec)
+    Plot.draw(measure_array_inf, measure_array_supr, measure_arry_med, structure, order, limit, measure, nb_exec, aggregate)
     response = HttpResponse(
         content_type='application/json',
         status=201,
