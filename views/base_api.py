@@ -19,6 +19,7 @@ from utils import D3jsData
 from utils import Constraints
 from utils import Plot
 from utils import LicenseGenerator
+from utils import CSVExporter
 
 LEVELS_FILE = "license_levels.json"
 
@@ -233,6 +234,8 @@ def add_license_experiment(request):
     for i in range(0, nb_exec):
         licenses = LicenseGenerator.generate(structure, order, limit)
         measure_array_inf[i] = []
+        inf_times = []
+        inf_nb_visits = []
         for object_license in licenses:
             t0 = time.time()
             object_license, nb_visit = add_license_to_db(object_license, method='infimum', viability_check=False)
@@ -241,9 +244,13 @@ def add_license_experiment(request):
                 measure_array_inf[i].append(t1-t0)
             else:
                 measure_array_inf[i].append(nb_visit)
+            inf_times.append(t1-t0)
+            inf_nb_visits.append(nb_visit)
         clear_neo4j_database(db)
         # Add from the top
         measure_array_supr[i] = []
+        supr_times = []
+        supr_nb_visits = []
         for object_license in licenses:
             t0 = time.time()
             object_license, nb_visit = add_license_to_db(object_license, method='supremum', viability_check=False)
@@ -252,11 +259,15 @@ def add_license_experiment(request):
                 measure_array_supr[i].append(t1-t0)
             else:
                 measure_array_supr[i].append(nb_visit)
+            supr_times.append(t1-t0)
+            supr_nb_visits.append(nb_visit)
         clear_neo4j_database(db)
         # from median
         license_levels = []
         level_median = 0
         measure_arry_med[i] = []
+        med_times = []
+        med_nb_visits = []
         for object_license in licenses:
             license_level = object_license.get_level()
             t0 = time.time()
@@ -271,7 +282,10 @@ def add_license_experiment(request):
                 measure_arry_med[i].append(t1-t0)
             else:
                 measure_arry_med[i].append(nb_visit)
+            med_times.append(t1-t0)
+            med_nb_visits.append(nb_visit)
         clear_neo4j_database(db)
+    CSVExporter.export(inf_times, inf_nb_visits, supr_times, supr_nb_visits, med_times, med_nb_visits, structure, order, limit, measure, nb_exec, aggregate)
     Plot.draw(measure_array_inf, measure_array_supr, measure_arry_med, structure, order, limit, measure, nb_exec, aggregate)
     response = HttpResponse(
         content_type='application/json',
