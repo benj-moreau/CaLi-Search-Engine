@@ -10,6 +10,8 @@ ODRL_WEIGHTS = [0.15, 0.29, 0.14, 0.09, 0.15, 0.09, 0.09]
 
 SET_SIZE_WEIGHTS = [0.05, 0.1, 0.2, 0.3, 0.2, 0.1, 0.05]
 
+NB_ACTIONS_LATTICE = 7
+
 
 # Generate a set of licenses using ODRL vocabulary.
 # structure: linear_order/no_order/partial_order
@@ -21,6 +23,8 @@ def generate(structure='linear_order', order='asc', limit=144):
         _linear_order(licenses, limit)
     elif structure == 'no_order':
         _no_order(licenses, limit)
+    elif structure == 'latice':
+        _lattice(licenses, NB_ACTIONS_LATTICE)
     else:
         _partial_order(licenses, limit)
     # order
@@ -103,3 +107,7 @@ def _generate_set():
     # print sum(ODRL_WEIGHTS)
     set_size = choice(len(SET_SIZE_WEIGHTS), size=1, replace=True, p=SET_SIZE_WEIGHTS)[0]
     return choice(ODRL.ACTIONS[:len(ODRL_WEIGHTS)], size=set_size, replace=False, p=ODRL_WEIGHTS)
+
+
+def _lattice(licenses, nb_actions):
+    return
