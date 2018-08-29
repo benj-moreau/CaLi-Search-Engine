@@ -1,8 +1,10 @@
 import random
+import itertools
 from operator import methodcaller
 from numpy.random import choice
 
 import utils.ODRL as ODRL
+from utils.TimerDecorator import fn_timer
 from objectmodels.License import License
 
 # Weights are calculated from http://purl.org/NET/rdflicense (probability to find an ation in a random license)
@@ -16,6 +18,7 @@ NB_ACTIONS_LATTICE = 7
 # Generate a set of licenses using ODRL vocabulary.
 # structure: linear_order/no_order/partial_order
 # order: asc/desc/rand
+@fn_timer
 def generate(structure='linear_order', order='asc', limit=144):
     licenses = []
     # structure
@@ -23,7 +26,7 @@ def generate(structure='linear_order', order='asc', limit=144):
         _linear_order(licenses, limit)
     elif structure == 'no_order':
         _no_order(licenses, limit)
-    elif structure == 'latice':
+    elif structure == 'lattice':
         _lattice(licenses, NB_ACTIONS_LATTICE)
     else:
         _partial_order(licenses, limit)
@@ -110,4 +113,27 @@ def _generate_set():
 
 
 def _lattice(licenses, nb_actions):
-    return
+    actions = ODRL.ACTIONS[:nb_actions]
+    for comb_perm in _all_actions_combinations(actions):
+        for permission_set in comb_perm:
+            permissions = frozenset(permission_set)
+            for comb_oblig in _all_actions_combinations(actions):
+                for obligation_set in comb_oblig:
+                    obligations = frozenset(obligation_set)
+                    if permissions.isdisjoint(obligations):
+                        for comb_prohib in _all_actions_combinations(actions):
+                            for prohibition_set in comb_prohib:
+                                prohibitions = frozenset(prohibition_set)
+                                if permissions.isdisjoint(prohibitions) and obligations.isdisjoint(prohibitions):
+                                    licenses.append(License())
+                                    licenses[-1].set_labels(['{}{}{}'.format(permissions, prohibitions, obligations)])
+                                    licenses[-1].set_permissions(permissions)
+                                    licenses[-1].set_obligations(obligations)
+                                    licenses[-1].set_prohibitions(prohibitions)
+
+
+def _all_actions_combinations(actions):
+    all_actions_combinations = []
+    for i in range(len(actions)+1):
+        all_actions_combinations.append(itertools.combinations(actions, i))
+    return all_actions_combinations

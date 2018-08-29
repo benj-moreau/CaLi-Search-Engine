@@ -218,6 +218,7 @@ def is_empty(str_list):
 
 @require_http_methods(['GET'])
 @need_auth
+@fn_timer
 def add_license_experiment(request):
     structure = request.GET.get('structure', 'linear_order')
     order = request.GET.get('order', 'rand')
@@ -296,7 +297,6 @@ def add_license_experiment(request):
 
 
 @need_auth
-@fn_timer
 def add_license(request):
     json_licenses = json.loads(request.body)
     added_licenses = []
@@ -335,7 +335,6 @@ def add_license(request):
     return response
 
 
-@fn_timer
 def add_license_to_db(object_license, method='infimum', license_levels=[], viability_check=True, nb_visit=0):
     neo_license = LicenseModel.nodes.get_or_none(hashed_sets=object_license.hash())
     if neo_license:
