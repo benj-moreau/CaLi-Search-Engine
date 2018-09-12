@@ -12,7 +12,7 @@ ODRL_WEIGHTS = [0.15, 0.29, 0.14, 0.09, 0.15, 0.09, 0.09]
 
 SET_SIZE_WEIGHTS = [0.05, 0.1, 0.2, 0.3, 0.2, 0.1, 0.05]
 
-NB_ACTIONS_LATTICE = 3
+NB_ACTIONS_LATTICE = 7
 
 
 # Generate a set of licenses using ODRL vocabulary.
