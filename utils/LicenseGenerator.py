@@ -12,7 +12,7 @@ ODRL_WEIGHTS = [0.15, 0.29, 0.14, 0.09, 0.15, 0.09, 0.09]
 
 SET_SIZE_WEIGHTS = [0.05, 0.1, 0.2, 0.3, 0.2, 0.1, 0.05]
 
-NB_ACTIONS_LATTICE = 7
+NB_ACTIONS_LATTICE = 3
 
 
 # Generate a set of licenses using ODRL vocabulary.
@@ -125,11 +125,12 @@ def _lattice(licenses, nb_actions):
                             for prohibition_set in comb_prohib:
                                 prohibitions = frozenset(prohibition_set)
                                 if permissions.isdisjoint(prohibitions) and obligations.isdisjoint(prohibitions):
-                                    licenses.append(License())
-                                    licenses[-1].set_labels(['{}{}{}'.format(permissions, prohibitions, obligations)])
-                                    licenses[-1].set_permissions(permissions)
-                                    licenses[-1].set_obligations(obligations)
-                                    licenses[-1].set_prohibitions(prohibitions)
+                                    if len(permissions)+len(prohibitions)+len(obligations) > 0:
+                                        licenses.append(License())
+                                        licenses[-1].set_labels(['{}{}{}'.format(permissions, prohibitions, obligations)])
+                                        licenses[-1].set_permissions(permissions)
+                                        licenses[-1].set_obligations(obligations)
+                                        licenses[-1].set_prohibitions(prohibitions)
 
 
 def _all_actions_combinations(actions):

@@ -1,3 +1,5 @@
+from operator import methodcaller
+
 from objectmodels.Dataset import Dataset
 from utils.ODRL import ACTIONS as ODRL_ACTIONS
 
@@ -10,6 +12,8 @@ class License(object):
         self.obligations = frozenset()
         self.prohibitions = frozenset()
         self.datasets = []
+        self.followings = []
+        self.precedings = []
 
     def hash(self):
         # used to compare licenses in terms of permissions, obligations, prohibitions
@@ -46,6 +50,12 @@ class License(object):
 
     def get_prohibitions(self):
         return [str(prohibitions) for prohibitions in self.prohibitions]
+
+    def get_followings(self):
+        return sorted(self.followings, key=methodcaller('get_level'))
+
+    def get_precedings(self):
+        return sorted(self.precedings, key=methodcaller('get_level'), reverse=True)
 
     def get_level(self):
         return len(self.obligations) + len(self.prohibitions)
