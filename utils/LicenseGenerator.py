@@ -112,25 +112,40 @@ def _generate_set():
     return choice(ODRL.ACTIONS[:len(ODRL_WEIGHTS)], size=set_size, replace=False, p=ODRL_WEIGHTS)
 
 
-def _lattice(licenses, nb_actions):
+def _lattice(licenses, nb_actions, consolidated=True):
     actions = ODRL.ACTIONS[:nb_actions]
-    for comb_perm in _all_actions_combinations(actions):
-        for permission_set in comb_perm:
-            permissions = frozenset(permission_set)
-            for comb_oblig in _all_actions_combinations(actions):
-                for obligation_set in comb_oblig:
-                    obligations = frozenset(obligation_set)
-                    if permissions.isdisjoint(obligations):
-                        for comb_prohib in _all_actions_combinations(actions):
-                            for prohibition_set in comb_prohib:
-                                prohibitions = frozenset(prohibition_set)
-                                if permissions.isdisjoint(prohibitions) and obligations.isdisjoint(prohibitions):
-                                    if len(permissions)+len(prohibitions)+len(obligations) > 0:
-                                        licenses.append(License())
-                                        licenses[-1].set_labels(['{}{}{}'.format(permissions, prohibitions, obligations)])
-                                        licenses[-1].set_permissions(permissions)
-                                        licenses[-1].set_obligations(obligations)
-                                        licenses[-1].set_prohibitions(prohibitions)
+    if not consolidated:
+        for comb_perm in _all_actions_combinations(actions):
+            for permission_set in comb_perm:
+                permissions = frozenset(permission_set)
+                for comb_oblig in _all_actions_combinations(actions):
+                    for obligation_set in comb_oblig:
+                        obligations = frozenset(obligation_set)
+                        if permissions.isdisjoint(obligations):
+                            for comb_prohib in _all_actions_combinations(actions):
+                                for prohibition_set in comb_prohib:
+                                    prohibitions = frozenset(prohibition_set)
+                                    if permissions.isdisjoint(prohibitions) and obligations.isdisjoint(prohibitions):
+                                        if len(permissions)+len(prohibitions)+len(obligations) > 0:
+                                            licenses.append(License())
+                                            licenses[-1].set_labels(['{}{}{}'.format(permissions, prohibitions, obligations)])
+                                            licenses[-1].set_permissions(permissions)
+                                            licenses[-1].set_obligations(obligations)
+                                            licenses[-1].set_prohibitions(prohibitions)
+    else:
+        for comb_actions in _all_actions_combinations(actions):
+            for other_sets in comb_actions:
+                permissions = frozenset(actions) - frozenset(other_sets)
+                for comb_other_actions in _all_actions_combinations(other_sets):
+                    for last_set in comb_other_actions:
+                        prohibitions = frozenset(last_set)
+                        obligations = frozenset(other_sets) - prohibitions
+                        if len(permissions)+len(prohibitions)+len(obligations) > 0:
+                            licenses.append(License())
+                            licenses[-1].set_labels(['{}{}{}'.format(permissions, prohibitions, obligations)])
+                            licenses[-1].set_permissions(permissions)
+                            licenses[-1].set_obligations(obligations)
+                            licenses[-1].set_prohibitions(prohibitions)
 
 
 def _all_actions_combinations(actions):
