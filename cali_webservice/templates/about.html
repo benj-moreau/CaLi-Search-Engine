@@ -42,11 +42,19 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="/">Search</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="#" id="dropdownSearch" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Search</a>
+              <div class="dropdown-menu" aria-labelledby="dropdownSearch">
+                <a class="dropdown-item" href="/ld/">Linked Data</a>
+                <a class="dropdown-item" href="/rep/">Repositories</a>
+              </div>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/graph">Graph</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="#" id="dropdownGraph" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Graph</a>
+              <div class="dropdown-menu" aria-labelledby="dropdownGraph">
+                <a class="dropdown-item" href="/ld/graph">Linked Data</a>
+                <a class="dropdown-item" href="/rep/graph">Repositories</a>
+              </div>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/about">About</a>
@@ -60,13 +68,13 @@
     </nav>
 
     <!-- Page Header -->
-    <header class="masthead" style="height: 280px; background-image: url({% static "img/home-bg.jpg"  %})">
+    <header class="masthead" style="height: 350px; background-image: url({% static "img/home-bg.jpg"  %})">
       <div class="overlay"></div>
       <div class="container">
         <div class="row">
           <div class="col-lg-8 col-md-10 mx-auto">
             <div class="site-heading">
-              <h1>About</h1>
+              <h1>CaLi: A Lattice-Based Model for License Classifications</h1>
             </div>
           </div>
         </div>
@@ -80,7 +88,7 @@
 
       <p>CaLi is a lattice-based model to classify licenses. CaLi classifications are able to automatically answer questions like,
       what are the licenses that are compliant with a specific license? And what are the licenses that are compatible with a specific license?
-      This license-based search engine is powered by a CaLi Classification and is able to classify licensed datasets.</p>
+      This license-based search engine is powered by a CaLi Classification and is able to classify licensed datasets and repositories.</p>
       </div>
 
       <div class="col-lg-8 col-md-10 mx-auto"><p class="post-meta" style="margin: 0px 0; font-size: 18px; font-style: italic; color: #868e96;">The source code of this work is available on GitHub under the MIT license</p></div>

@@ -42,11 +42,19 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="/">Search</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="#" id="dropdownSearch" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Search</a>
+              <div class="dropdown-menu" aria-labelledby="dropdownSearch">
+                <a class="dropdown-item" href="/ld/">Linked Data</a>
+                <a class="dropdown-item" href="/rep/">Repositories</a>
+              </div>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/graph">Graph</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="#" id="dropdownGraph" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Graph</a>
+              <div class="dropdown-menu" aria-labelledby="dropdownGraph">
+                <a class="dropdown-item" href="/ld/graph">Linked Data</a>
+                <a class="dropdown-item" href="/rep/graph">Repositories</a>
+              </div>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/about">About</a>

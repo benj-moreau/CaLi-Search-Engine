@@ -22,7 +22,7 @@ var search = new Vue({
   },
   methods: {
     get_licenses: function () {
-      this.$http.get('/api/licenses/').then(response => {
+      this.$http.get('/api/' + get_path_graph() + '/licenses/').then(response => {
         return response.body;
       }).then(json_licenses => {
         this.licenses = json_licenses;
@@ -30,7 +30,7 @@ var search = new Vue({
     },
     search: function () {
       parameters = "query=" + encodeURIComponent(this.query) + "&license=" + encodeURIComponent(this.selected_license.hashed_sets) + "&sens=" + encodeURIComponent(this.selected_sens);
-      window.location = "/search?" + parameters
+      window.location = "/" + get_path_graph() + "/search?" + parameters
     },
   },
 });

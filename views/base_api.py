@@ -28,26 +28,26 @@ LEVELS_FILE = "license_levels.json"
 
 
 @require_http_methods(['GET', 'POST', 'DELETE'])
-def license_path(request):
+def license_path(request, graph):
     if request.method == 'GET':
-        return get_licenses(request)
+        return get_licenses(request, graph)
     elif request.method == 'POST':
-        return add_license(request)
+        return add_license(request, graph)
     elif request.method == 'DELETE':
         return delete_license(request)
 
 
 @require_http_methods(['GET', 'POST'])
-def dataset_path(request):
+def dataset_path(request, graph):
     if request.method == 'GET':
-        return get_datasets(request)
+        return get_datasets(request, graph)
     elif request.method == 'POST':
-        return add_dataset(request)
+        return add_dataset(request, graph)
 
 
-def get_licenses(request):
+def get_licenses(request, graph):
     response_content = []
-    for neo_license in LicenseModel.nodes:
+    for neo_license in LicenseModel.nodes.filter(graph__exact=graph):
         license_object = ObjectFactory.objectLicense(neo_license)
         response_content.append(license_object.to_json())
     response = HttpResponse(
@@ -57,9 +57,9 @@ def get_licenses(request):
     return response
 
 
-def get_datasets(request):
+def get_datasets(request, graph):
     response_content = []
-    for neo_dataset in DatasetModel.nodes:
+    for neo_dataset in DatasetModel.nodes.filter(graph__exact=graph):
         dataset_object = ObjectFactory.objectDataset(neo_dataset)
         response_content.append(dataset_object.to_json())
     response = HttpResponse(
@@ -70,11 +70,11 @@ def get_datasets(request):
 
 
 @need_auth
-def add_dataset(request):
+def add_dataset(request, graph):
     json_dataset = json.loads(request.body)
     object_dataset = Dataset()
     object_dataset.from_json(json_dataset)
-    neo_dataset = NeoFactory.NeoDataset(object_dataset)
+    neo_dataset = NeoFactory.NeoDataset(object_dataset, graph)
     object_dataset = ObjectFactory.objectDataset(neo_dataset)
     try:
         neo_dataset.save()
@@ -94,9 +94,9 @@ def add_dataset(request):
 
 
 @require_http_methods(['GET'])
-def get_license_by_hash(request, hashed_sets):
+def get_license_by_hash(request, hashed_sets, graph):
     try:
-        neo_license = LicenseModel.nodes.get(hashed_sets=hashed_sets)
+        neo_license = LicenseModel.nodes.filter(graph__exact=graph).get(hashed_sets=hashed_sets)
         license_object = ObjectFactory.objectLicense(neo_license)
         response = HttpResponse(
             json.dumps(license_object.to_json()),
@@ -111,9 +111,9 @@ def get_license_by_hash(request, hashed_sets):
     return response
 
 
-def get_dataset_by_hash(request, hashed_uri):
+def get_dataset_by_hash(request, hashed_uri, graph):
     try:
-        neo_dataset = DatasetModel.nodes.get(hashed_uri=hashed_uri)
+        neo_dataset = DatasetModel.nodes.filter(graph__exact=graph).get(hashed_uri=hashed_uri)
         dataset_object = ObjectFactory.objectDataset(neo_dataset)
         response = HttpResponse(
             json.dumps(dataset_object.to_json()),
@@ -129,7 +129,7 @@ def get_dataset_by_hash(request, hashed_uri):
 
 
 @require_http_methods(['GET'])
-def get_license_search(request):
+def get_license_search(request, graph):
     query = request.GET.get('query', None)
     label = request.GET.get('label', None)
     permissions = request.GET.get('permissions', None)
@@ -141,7 +141,7 @@ def get_license_search(request):
     prohibitions = request.GET.get('prohibitions', None)
     if is_empty(prohibitions):
         prohibitions = None
-    neo_licenses = LicenseModel.nodes
+    neo_licenses = LicenseModel.nodes.filter(graph__exact=graph)
     if query:
         neo_licenses = license_filter_labels(query)
     else:
@@ -165,12 +165,12 @@ def get_license_search(request):
 
 
 @require_http_methods(['GET'])
-def get_dataset_search(request):
+def get_dataset_search(request, graph):
     query = request.GET.get('query', None)
     label = request.GET.get('label', None)
     descr = request.GET.get('descr', None)
     uri = request.GET.get('uri', None)
-    neo_datasets = DatasetModel.nodes
+    neo_datasets = DatasetModel.nodes.filter(graph__exact=graph)
     if query:
         neo_datasets = dataset_filter_search(query)
     else:
@@ -192,9 +192,9 @@ def get_dataset_search(request):
 
 
 @require_http_methods(['GET'])
-def get_datasets_of_licenses(request, hashed_sets):
+def get_datasets_of_licenses(request, hashed_sets, graph):
     try:
-        neo_license = LicenseModel.nodes.get(hashed_sets=hashed_sets)
+        neo_license = LicenseModel.nodes.filter(graph__exact=graph).get(hashed_sets=hashed_sets)
         license_datasets = []
         for dataset in neo_license.datasets.all():
             dataset_object = ObjectFactory.objectDataset(dataset)
@@ -255,7 +255,6 @@ def add_license_experiment(request):
             inf_times.append(t1-t0)
             inf_nb_visits.append(nb_visit)
         # clear_neo4j_database(db)
-        # add_lattice_to_db(lattice.get_infimum())
         LOGGER.info("infimum insertion end")
         lattice = Lattice(ODRL.ACTIONS)
         LOGGER.info("supremum insertion begin")
@@ -317,7 +316,7 @@ def add_license_experiment(request):
 
 
 @need_auth
-def add_license(request):
+def add_license(request, graph):
     json_licenses = json.loads(request.body)
     added_licenses = []
     random.shuffle(json_licenses)
@@ -336,9 +335,9 @@ def add_license(request):
                 if license_levels:
                     level_median = median(license_levels)
                 if object_license.get_level() > level_median:
-                    object_license, nb_visit = add_license_to_db(object_license, method='supremum', license_levels=license_levels)
+                    object_license, nb_visit = add_license_to_db(object_license, method='supremum', license_levels=license_levels, graph=graph)
                 else:
-                    object_license, nb_visit = add_license_to_db(object_license, method='infimum', license_levels=license_levels)
+                    object_license, nb_visit = add_license_to_db(object_license, method='infimum', license_levels=license_levels, graph=graph)
                 added_licenses.append(object_license.to_json())
             else:
                 added_licenses.append("Not a valid license: License is non-viable")
@@ -355,22 +354,8 @@ def add_license(request):
     return response
 
 
-def add_lattice_to_db(infimum):
-    neo_infimum = LicenseModel.nodes.get_or_none(hashed_sets=infimum.hash())
-    if not neo_infimum:
-        neo_infimum = NeoFactory.NeoLicense(infimum)
-        neo_infimum.save()
-    for license_followers in infimum.followings:
-        neo_follower = LicenseModel.nodes.get_or_none(hashed_sets=license_followers.hash())
-        if not neo_follower:
-            neo_follower = NeoFactory.NeoLicense(license_followers)
-            neo_follower.save()
-        neo_follower.precedings.connect(neo_infimum)
-        add_lattice_to_db(license_followers)
-
-
-def add_license_to_db(object_license, method='infimum', license_levels=[], viability_check=True, nb_visit=0):
-    neo_license = LicenseModel.nodes.get_or_none(hashed_sets=object_license.hash())
+def add_license_to_db(object_license, method='infimum', license_levels=[], viability_check=True, nb_visit=0, graph='ld'):
+    neo_license = LicenseModel.nodes.filter(graph__exact=graph).get_or_none(hashed_sets=object_license.hash())
     if neo_license:
         # update of labels list if needed
         neo_license.labels = list(set(object_license.get_labels()).union(neo_license.labels))
@@ -378,14 +363,14 @@ def add_license_to_db(object_license, method='infimum', license_levels=[], viabi
     else:
         # license does not exists in db
         if method == 'infimum':
-            neo_license, nb_visit = update_licenses_relations_infimum(object_license, viability_check, nb_visit)
+            neo_license, nb_visit = update_licenses_relations_infimum(object_license, viability_check, nb_visit, graph)
         else:
-            neo_license, nb_visit = update_licenses_relations_supremum(object_license, viability_check, nb_visit)
+            neo_license, nb_visit = update_licenses_relations_supremum(object_license, viability_check, nb_visit, graph)
         license_levels.append(object_license.get_level())
     for dataset in object_license.get_datasets():
-        neo_dataset = DatasetModel.nodes.get_or_none(hashed_uri=dataset.hash())
+        neo_dataset = DatasetModel.nodes.filter(graph__exact=graph).get_or_none(hashed_uri=dataset.hash())
         if not neo_dataset:
-            neo_dataset = NeoFactory.NeoDataset(dataset)
+            neo_dataset = NeoFactory.NeoDataset(dataset, graph)
             neo_dataset.save()
         neo_license.datasets.connect(neo_dataset)
     object_license = ObjectFactory.objectLicense(neo_license)
@@ -402,10 +387,10 @@ def add_license_to_lattice(object_license, lattice, method='infimum', license_le
     return nb_visit
 
 
-def update_licenses_relations_infimum(object_license, viability_check, nb_visit):
+def update_licenses_relations_infimum(object_license, viability_check, nb_visit, graph='ld'):
     tested_licenses = [object_license]
-    license_leaves = get_leaf_licenses()
-    neo_license = NeoFactory.NeoLicense(object_license)
+    license_leaves = get_leaf_licenses(graph)
+    neo_license = NeoFactory.NeoLicense(object_license, graph)
     neo_license.save()
     for neo_license_leaf in license_leaves:
         object_license_leaf = ObjectFactory.objectLicense(neo_license_leaf)
@@ -417,7 +402,7 @@ def update_licenses_relations_infimum(object_license, viability_check, nb_visit)
     return neo_license, nb_visit
 
 
-def update_licenses_relations_infimum_lattice(object_license, lattice, nb_visit):
+def update_licenses_relations_infimum_lattice(object_license, lattice, nb_visit, graph='ld'):
     tested_licenses = [object_license]
     license_leaves = [lattice.get_infimum()]
     lattice.add_license(object_license)
@@ -430,10 +415,10 @@ def update_licenses_relations_infimum_lattice(object_license, lattice, nb_visit)
     return nb_visit
 
 
-def update_licenses_relations_supremum(object_license, viability_check, nb_visit):
+def update_licenses_relations_supremum(object_license, viability_check, nb_visit, graph='ld'):
     tested_licenses = [object_license]
-    license_roots = get_root_licenses()
-    neo_license = NeoFactory.NeoLicense(object_license)
+    license_roots = get_root_licenses(graph)
+    neo_license = NeoFactory.NeoLicense(object_license, graph)
     neo_license.save()
     for neo_license_root in license_roots:
         object_license_root = ObjectFactory.objectLicense(neo_license_root)
@@ -645,9 +630,9 @@ def delete_license(request):
 
 @fn_timer
 @require_http_methods(['GET'])
-def get_compliant(request, hashed_sets):
+def get_compliant(request, hashed_sets, graph):
     try:
-        neo_licenses = get_compatible_licenses(hashed_sets)
+        neo_licenses = get_compatible_licenses(hashed_sets, graph)
         compatible_licenses = []
         for neo_license in neo_licenses:
             license_object = ObjectFactory.objectLicense(neo_license)
@@ -667,9 +652,9 @@ def get_compliant(request, hashed_sets):
 
 @fn_timer
 @require_http_methods(['GET'])
-def get_compatible(request, hashed_sets):
+def get_compatible(request, hashed_sets, graph):
     try:
-        neo_licenses = get_compliant_licenses(hashed_sets)
+        neo_licenses = get_compliant_licenses(hashed_sets, graph)
         compatible_licenses = []
         for neo_license in neo_licenses:
             license_object = ObjectFactory.objectLicense(neo_license)
@@ -689,10 +674,10 @@ def get_compatible(request, hashed_sets):
 
 @fn_timer
 @require_http_methods(['GET'])
-def get_graph(request):
+def get_graph(request, graph):
     nodes = []
     links = []
-    for neo_license in LicenseModel.nodes:
+    for neo_license in LicenseModel.nodes.filter(graph__exact=graph):
         license_object = ObjectFactory.objectLicense(neo_license)
         nodes.append(D3jsData.license_node(license_object))
         license_level = license_object.get_level()

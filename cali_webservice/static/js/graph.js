@@ -7,7 +7,7 @@ var graph = new Vue({
   },
   methods: {
     get_graph: function () {
-      this.$http.get('/api/licenses/graph/').then(response => {
+      this.$http.get('/api/' + get_path_graph() + '/licenses/graph/').then(response => {
         return response.body;
       }).then(json_graph => {
         draw_graph(json_graph);
