@@ -90,7 +90,7 @@ class License(object):
         self.set_obligations(frozenset(json_license['obligations']))
         self.set_prohibitions(frozenset(json_license['prohibitions']))
         datasets = []
-        for dataset in json_license['datasets']:
+        for dataset in json_license['resources']:
             dataset_object = Dataset()
             dataset_object.from_json(dataset)
             datasets.append(dataset_object)
@@ -102,7 +102,7 @@ class License(object):
             'permissions': self.get_permissions(),
             'obligations': self.get_obligations(),
             'prohibitions': self.get_prohibitions(),
-            'datasets': [dataset.to_json() for dataset in self.datasets],
+            'resources': [dataset.to_json() for dataset in self.datasets],
             'hashed_sets': self.hash()
         }
 
