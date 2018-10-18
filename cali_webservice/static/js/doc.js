@@ -4,27 +4,27 @@ var api_doc = new Vue({
     api: [
       {
         'method': 'GET',
-        'path': 'api/[classification]/datasets',
+        'path': 'api/[classification]/resources',
         'params': [{'name': '[classification]', 'descr': 'classification \'ld\' or \'rep\''}],
-        'descr': 'Retrieve all datasets'
+        'descr': 'Retrieve all resources'
       },
       {
         'method': 'GET',
-        'path': 'api/[classification]/datasets/[id]',
+        'path': 'api/[classification]/resources/[id]',
         'params': [{'name': '[classification]', 'descr': 'classification \'ld\' or \'rep\''},
                    {'name': '[id]', 'descr': 'The id of the dataset'}],
-        'descr': 'Retrieve a specific dataset using dataset\'s id'
+        'descr': 'Retrieve a specific resource using dataset\'s id'
       },
       {
         'method': 'GET',
-        'path': 'api/[classification]/datasets/search',
+        'path': 'api/[classification]/resources/search',
         'params': [{'name': '[classification]', 'descr': 'classification \'ld\' or \'rep\''},
                    {'name': 'query', 'descr': 'FullText search in every dataset\'s attribute'},
                    {'name': 'label', 'descr': 'FullText search in label attribute'},
                    {'name': 'descr', 'descr': 'FullText search in description attribute'},
                    {'name': 'uri', 'descr': 'FullText search in uri attribute'}
                   ],
-        'descr': 'Retrieve datasets using FullText search'
+        'descr': 'Retrieve resources using FullText search'
       },
       {
         'method': 'GET',
@@ -55,10 +55,10 @@ var api_doc = new Vue({
       },
       {
         'method': 'GET',
-        'path': 'api/[classification]/licenses/[id]/datasets',
+        'path': 'api/[classification]/licenses/[id]/resources',
         'params': [{'name': '[classification]', 'descr': 'classification \'ld\' or \'rep\''},
                    {'name': '[id]', 'descr': 'The id of the license'}],
-        'descr': 'Retrieve datasets licensed under a specific license using the id of the license'
+        'descr': 'Retrieve resources licensed under a specific license using the id of the license'
       },
       {
         'method': 'GET',
@@ -76,8 +76,15 @@ var api_doc = new Vue({
                    {'name': 'obligations', 'descr': 'A set of action contained in the license obligations set'},
                    {'name': 'prohibitions', 'descr': 'A set of action contained in the license prohibitions set'}
                   ],
-        'descr': 'Search API to retrieve specific licenses and licensed dataset\'s'
-      }
+        'descr': 'Search API to retrieve specific licenses and licensed resource\'s'
+      },
+      {
+        'method': 'GET',
+        'path': 'api/[classification]/exports/[format]',
+        'params': [{'name': '[classification]', 'descr': 'classification \'ld\' or \'rep\''},
+                   {'name': '[format]', 'descr': 'rdf serialization format: \'n3\', \'nt\', \'xml\', \'turtle\', \'json-ld\''}],
+        'descr': 'Export classification in RDF. Licenses are described using ODRL vocabulary'
+      },
     ],
   },
 });

@@ -23,6 +23,8 @@ from utils import Plot
 from utils import LicenseGenerator
 from utils import CSVExporter
 from utils import ODRL
+from utils import RDFExporter
+
 
 LEVELS_FILE = "license_levels.json"
 
@@ -53,6 +55,21 @@ def get_licenses(request, graph):
     response = HttpResponse(
         json.dumps(response_content),
         content_type='application/json')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+def export_licenses(request, graph, serialization_format):
+    licenses = []
+    if serialization_format not in ['n3', 'nt', 'xml', 'turtle', 'json-ld']:
+        serialization_format = 'turtle'
+    for neo_license in LicenseModel.nodes.filter(graph__exact=graph):
+        license_object = ObjectFactory.objectLicense(neo_license)
+        licenses.append(license_object.to_json())
+    rdf_licenses = RDFExporter.get_rdf(licenses, graph)
+    response = HttpResponse(
+        rdf_licenses.serialize(format=serialization_format),
+        content_type='text/{}'.format(serialization_format))
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
