@@ -20,6 +20,7 @@ def get_rdf(licenses, graph):
             rdf_graph.add((subject, ODRL['duty'], ODRL[action]))
         for resource in license.get('resources'):
             subject_resource = URIRef(resource['uri'])
+            rdf_graph.add((subject_resource, RDF.type, ODRL['Asset']))
             rdf_graph.add((subject_resource, RDFS.label, Literal(resource.get('label'))))
             rdf_graph.add((subject_resource, RDFS.comment, Literal(resource.get('description'))))
             rdf_graph.add((subject_resource, ODRL['hasPolicy'], subject))
