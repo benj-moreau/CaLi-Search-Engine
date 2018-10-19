@@ -59,21 +59,6 @@ def get_licenses(request, graph):
     return response
 
 
-def export_licenses(request, graph, serialization_format):
-    licenses = []
-    if serialization_format not in ['n3', 'nt', 'xml', 'turtle', 'json-ld']:
-        serialization_format = 'turtle'
-    for neo_license in LicenseModel.nodes.filter(graph__exact=graph):
-        license_object = ObjectFactory.objectLicense(neo_license)
-        licenses.append(license_object.to_json())
-    rdf_licenses = RDFExporter.get_rdf(licenses, graph)
-    response = HttpResponse(
-        rdf_licenses.serialize(format=serialization_format),
-        content_type='text/{}'.format(serialization_format))
-    response['Access-Control-Allow-Origin'] = '*'
-    return response
-
-
 def get_datasets(request, graph):
     response_content = []
     for neo_dataset in DatasetModel.nodes.filter(graph__exact=graph):
@@ -689,7 +674,26 @@ def get_compatible(request, hashed_sets, graph):
     return response
 
 
-@fn_timer
+def export_licenses(request, graph, serialization_format):
+    licenses = []
+    if serialization_format not in ['n3', 'nt', 'xml', 'turtle', 'json-ld']:
+        serialization_format = 'turtle'
+    for neo_license in LicenseModel.nodes.filter(graph__exact=graph):
+        license_object = ObjectFactory.objectLicense(neo_license)
+        license_object = license_object.to_json()
+        license_object['compatible_licenses'] = []
+        for compatible_neo_license in neo_license.followings.all():
+            compatible_license = ObjectFactory.objectLicense(compatible_neo_license)
+            license_object['compatible_licenses'].append(compatible_license.hash())
+        licenses.append(license_object)
+    rdf_licenses = RDFExporter.get_rdf(licenses, graph)
+    response = HttpResponse(
+        rdf_licenses.serialize(format=serialization_format),
+        content_type='text/{}'.format(serialization_format))
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
 @require_http_methods(['GET'])
 def get_graph(request, graph):
     nodes = []
