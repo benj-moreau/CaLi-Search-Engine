@@ -5,6 +5,9 @@ import csv
 
 COLNAMES = ['nb_nodes', 'inf_times', 'inf_nb_visits', 'supr_times', 'supr_nb_visits', 'med_times', 'med_nb_visits']
 AGGREGATE = 1
+MARKER_SIZE = 10
+MARKER_EVERY = 10
+MARKER_WIDTH = 1.5
 
 
 def get_column(index, filename):
@@ -41,7 +44,7 @@ def generate_exp2():
     med = get_column(6, 'expermiental_results/lattice-rand-144-nb_visited-x1-agg50.csv')
     plt.plot(_aggregate(med, AGGREGATE), linewidth=2, color='red')
     plt.xlabel('Number of nodes in the graph')
-    plt.ylabel('Number of visited node')
+    plt.ylabel('Number of visited nodes')
     plt.axis([0, len(med), 0, len(med)])
     plt.grid()
     plt.tight_layout()
@@ -53,9 +56,9 @@ def generate_exp1():
     inf = get_column(2, 'expermiental_results/linear_order-asc-144-nb_visited-x1-agg1.csv')
     sup = get_column(4, 'expermiental_results/linear_order-asc-144-nb_visited-x1-agg1.csv')
     med = get_column(6, 'expermiental_results/linear_order-asc-144-nb_visited-x1-agg1.csv')
-    plt.plot(inf, linewidth=2, label="Infimum")
-    plt.plot(sup, linewidth=2, label="Supremum")
-    plt.plot(med, linewidth=2, label="Median")
+    plt.plot(inf, linewidth=2, label="Infimum", marker='+', markersize=MARKER_SIZE+5, markevery=MARKER_EVERY, markeredgewidth=MARKER_WIDTH)
+    plt.plot(sup, linewidth=2, label="Supremum", marker='x', markersize=MARKER_SIZE, markevery=MARKER_EVERY, markeredgewidth=MARKER_WIDTH)
+    plt.plot(med, linewidth=2, label="Median", marker='.', markersize=MARKER_SIZE-4, markevery=MARKER_EVERY, markeredgewidth=MARKER_WIDTH)
     plt.axis([0, len(inf), 0, len(inf)])
     plt.grid()
     plt.legend(bbox_to_anchor=(1.138, 0.9))
@@ -63,10 +66,10 @@ def generate_exp1():
     inf2 = get_column(2, 'expermiental_results/linear_order-desc-144-nb_visited-x1-agg1.csv')
     sup2 = get_column(4, 'expermiental_results/linear_order-desc-144-nb_visited-x1-agg1.csv')
     med2 = get_column(6, 'expermiental_results/linear_order-desc-144-nb_visited-x1-agg1.csv')
-    plt.plot(inf2, linewidth=2, label="Infimum")
-    plt.plot(sup2, linewidth=2, label="Supremum")
-    plt.plot(med2, linewidth=2, label="Median")
-    plt.ylabel('Number of visited node')
+    plt.plot(inf2, linewidth=2, label="Infimum", marker='+', markersize=MARKER_SIZE+5, markevery=MARKER_EVERY, markeredgewidth=MARKER_WIDTH)
+    plt.plot(sup2, linewidth=2, label="Supremum", marker='x', markersize=MARKER_SIZE, markevery=MARKER_EVERY, markeredgewidth=MARKER_WIDTH)
+    plt.plot(med2, linewidth=2, label="Median", marker='.', markersize=MARKER_SIZE-4, markevery=MARKER_EVERY, markeredgewidth=MARKER_WIDTH)
+    plt.ylabel('Number of visited nodes')
     plt.axis([0, len(inf2), 0, len(inf2)])
     plt.grid()
     plt.subplot(3, 1, 3)
