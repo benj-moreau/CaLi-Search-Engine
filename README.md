@@ -1,5 +1,5 @@
 # CaLi
-Experiments with lattice.
+Define a partial order over licenses using CaLi model.
 
 # Prelude
 Installation in a `virtualenv` is advised.
