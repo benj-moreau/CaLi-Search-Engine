@@ -39,3 +39,22 @@ CaLi WebApp is accessible at: `http://127.0.0.1:8000/``
 Cali uses the bolt connector to communicate with neo4j.
 if connection is not working, check bolt configuration in neo4j folder `conf/neo4j.conf`.
 and update `/cali_webservice/local_settings.py`.
+
+# Execute experiment
+To use the experiment api, you will need your ADMIN_PASSWORD configured in `/cali_webservice/local_settings.py`
+
+Experiment api is available at `/api/licenses/experiment`. you can pass 2 HTTP parameters:
+
+| Parameter |          Values          | Description                     |
+|-----------|:------------------------:|---------------------------------|
+| structure | `lattice` `linear_order` | structure of the set of license |
+| order     |    `rand` `asc` `desc`   | Restrictiveness order           |
+
+
+For example, the following experiment will classify all possible licenses of a vocabulary of 7 actions, in a random order
+
+```bash
+curl -X GET   'http://127.0.0.1:8000/api/licenses/experiment/?structure=lattice&order=rand'   -H 'Admin-Password: ADMIN_PASSWORD'
+```
+
+Results are available in `experimental_results/` folder.
