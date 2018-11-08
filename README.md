@@ -41,13 +41,15 @@ CaLi WebApp is accessible at: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 ## In case of errors
 
 CaLi uses the bolt connector to communicate with Neo4j.
-if connection is not working, check bolt configuration in Neo4j directory in file `conf/neo4j.conf`.
-and update `/cali_webservice/local_settings.py`.
+
+If connection is not working, check bolt configuration in Neo4j directory in file `conf/neo4j.conf` and update `/cali_webservice/local_settings.py`.
 
 # Build Creative Commons CaLi classification
 
-To create a CaLi classification, Post an array of licenses objects at `http://127.0.0.1:8000/api/ld/licenses`
-Notice that actions in `permissions`, `obligations`, `prohibitions` contains only [ODRL actions](https://www.w3.org/TR/odrl-vocab/#actionConcepts)
+To create a CaLi classification, Post an array of licenses objects at `http://127.0.0.1:8000/api/ld/licenses`.
+
+Notice that actions in `permissions`, `obligations`, `prohibitions` should contain only [ODRL actions](https://www.w3.org/TR/odrl-vocab/#actionConcepts).
+
 The following example classifies Creative Commons licenses:
 
 (Do not forget to replace YOUR_ADMIN_PASSWORD)
@@ -191,9 +193,20 @@ curl -X POST \
 
 The generated graph is visible at [http://127.0.0.1:8000/ld/graph](http://127.0.0.1:8000/ld/graph).
 
+Notice that graph is also available through Neo4j HTTP Browser at [http://localhost:7474/browser/](http://localhost:7474/browser/). (Port is set in `conf/neo4j.conf` in Neo4j directory)
+
+You will be able to execute custom [Cypher queries](https://neo4j.com/docs/developer-manual/current/get-started/cypher/) on CaLi classification.
+
 ## Search feature
-To enable search feature, add resources in `resources` keys of license object.
-Here is an example of license with resources:
+With search feature, you can:
+ - `Find resources whose licenses are compatible with a specific license`
+ - `Find resources whose licenses are compliant with a specific license`
+
+Result is ordered by restrictiveness
+
+To enable search feature, add resources in `resources` keys of license objects.
+
+Here is an example of licensed resources:
 ```json
 {
         "permissions": [
@@ -233,12 +246,6 @@ Here is an example of license with resources:
     }
 ```
 
-Then, you can:
-
- - `Find dataset whose licenses are compatible with a specific license`
- - `Find dataset whose licenses are compliant with a specific license`
-Result is ordered by restrictiveness
-
 Search will be available at [http://127.0.0.1:8000/ld/](http://127.0.0.1:8000/ld/)
 
 #Reset CaLi classification
@@ -254,8 +261,6 @@ curl -X DELETE \
 ```
 
 # Execute experiment
-To use the experiment api, you will need your ADMIN_PASSWORD configured in `/cali_webservice/local_settings.py`
-
 Experiment api is available at `/api/licenses/experiment`. you can pass 2 HTTP parameters:
 
 | Parameter |          Values          | Description                     |
