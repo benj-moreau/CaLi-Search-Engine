@@ -36,7 +36,7 @@ Navigate to cali folder and execute:
 ```bash
 python manage.py runserver
 ```
-CaLi WebApp is accessible at: `http://127.0.0.1:8000/``
+CaLi WebApp is accessible at: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
 ## In case of errors
 
