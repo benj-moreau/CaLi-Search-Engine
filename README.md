@@ -266,6 +266,7 @@ Experiment api is available at `/api/licenses/experiment`. you can pass 2 HTTP p
 
 For example, the following experiment will classify all possible licenses of a vocabulary of 7 actions, in a random order using infimum, supremum and median algorithm.
 
+(Do not forget to replace YOUR_ADMIN_PASSWORD)
 ```bash
 curl -X GET   'http://127.0.0.1:8000/api/licenses/experiment/?structure=lattice&order=rand'   -H 'Admin-Password: YOUR_ADMIN_PASSWORD'
 ```
