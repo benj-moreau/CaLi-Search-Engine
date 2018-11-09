@@ -5,6 +5,7 @@ from django.views.decorators.http import require_http_methods
 
 from neomodels.NeoModels import get_compatible_licenses, get_compliant_licenses
 from neomodels import ObjectFactory
+from utils import D3jsData
 
 
 @require_http_methods(['GET'])
@@ -45,6 +46,9 @@ def ld_search(request):
     sens = request.GET.get('sens', '')
     keywords = query.split()
     results = []
+    nodes = []
+    links = []
+    added_nodes = []
     if sens == 'compatible':
         neo_licenses = get_compliant_licenses(hashed_sets, graph)
     else:
@@ -53,9 +57,22 @@ def ld_search(request):
         license_object = ObjectFactory.objectLicense(neo_license)
         if keywords:
             license_object = query_filter(license_object, keywords)
-        if license_object:
+        if license_object.datasets:
             results.append(license_object.to_json())
-    return render(request, 'search.html', {'results': json.dumps(results), 'nb_datasets': nb_datasets(results)})
+        # we add license and datasets to the graph
+        if license_object not in added_nodes:
+            nodes.append(D3jsData.license_node(license_object))
+            added_nodes.append(license_object)
+        for dataset_object in license_object.datasets:
+            nodes.append(D3jsData.dataset_node(dataset_object, license_object.get_level()))
+            links.append(D3jsData.dataset_link(license_object, dataset_object))
+        for compatible_neo_license in neo_license.followings.all():
+            compatible_license_object = ObjectFactory.objectLicense(compatible_neo_license)
+            if compatible_license_object not in added_nodes:
+                nodes.append(D3jsData.license_node(compatible_license_object))
+                added_nodes.append(compatible_license_object)
+            links.append(D3jsData.compatible_link(license_object, compatible_license_object))
+    return render(request, 'search.html', {'results': json.dumps(results), 'nb_datasets': nb_datasets(results), 'graph': json.dumps(D3jsData.graph(nodes, links))})
 
 
 @require_http_methods(['GET'])
@@ -66,6 +83,9 @@ def rep_search(request):
     sens = request.GET.get('sens', '')
     keywords = query.split()
     results = []
+    nodes = []
+    links = []
+    added_nodes = []
     if sens == 'compatible':
         neo_licenses = get_compliant_licenses(hashed_sets, graph)
     else:
@@ -74,9 +94,22 @@ def rep_search(request):
         license_object = ObjectFactory.objectLicense(neo_license)
         if keywords:
             license_object = query_filter(license_object, keywords)
-        if license_object:
+        if license_object.datasets:
             results.append(license_object.to_json())
-    return render(request, 'search.html', {'results': json.dumps(results), 'nb_datasets': nb_datasets(results)})
+        # we add license and datasets to the graph
+        if license_object not in added_nodes:
+            nodes.append(D3jsData.license_node(license_object))
+            added_nodes.append(license_object)
+        for dataset_object in license_object.datasets:
+            nodes.append(D3jsData.dataset_node(dataset_object, license_object.get_level()))
+            links.append(D3jsData.dataset_link(license_object, dataset_object))
+        for compatible_neo_license in neo_license.followings.all():
+            compatible_license_object = ObjectFactory.objectLicense(compatible_neo_license)
+            if compatible_license_object not in added_nodes:
+                nodes.append(D3jsData.license_node(compatible_license_object))
+                added_nodes.append(compatible_license_object)
+            links.append(D3jsData.compatible_link(license_object, compatible_license_object))
+    return render(request, 'search.html', {'results': json.dumps(results), 'nb_datasets': nb_datasets(results), 'graph': json.dumps(D3jsData.graph(nodes, links))})
 
 
 def query_filter(license_object, keywords):
@@ -86,11 +119,8 @@ def query_filter(license_object, keywords):
             if keyword.lower() in dataset.label.lower() or keyword.lower() in dataset.description.lower():
                 matching_datasets.append(dataset)
                 break
-    if matching_datasets:
-        license_object.datasets = matching_datasets
-        return license_object
-    else:
-        return None
+    license_object.datasets = matching_datasets
+    return license_object
 
 
 def nb_datasets(results):
