@@ -19,7 +19,6 @@ from utils.TimerDecorator import fn_timer, LOGGER
 from utils.authentificator import need_auth
 from utils import D3jsData
 from utils import Constraints
-from utils import Plot
 from utils import LicenseGenerator
 from utils import CSVExporter
 from utils import ODRL
@@ -308,7 +307,6 @@ def add_license_experiment(request):
         LOGGER.info("median insertion end")
         lattice = Lattice(ODRL.ACTIONS)
     CSVExporter.export(inf_times, inf_nb_visits, supr_times, supr_nb_visits, med_times, med_nb_visits, structure, order, limit, measure, nb_exec, aggregate)
-    Plot.draw(measure_array_inf, measure_array_supr, measure_arry_med, structure, order, limit, measure, nb_exec, aggregate)
     response = HttpResponse(
         content_type='application/json',
         status=201,
