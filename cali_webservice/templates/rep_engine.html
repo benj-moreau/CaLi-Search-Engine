@@ -1,0 +1,178 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="A license compliant search engine powered by CaLi">
+    <meta name="author" content="Benjamin MOREAU">
+
+    <title>License Compliant Search Engine</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "vendor/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" type="text/css">
+
+    <!-- Custom fonts for this template -->
+    <link href="{% static "vendor/font-awesome/css/font-awesome.min.css" %}" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- Custom styles for this template -->
+    <link href="{% static "css/clean-blog.min.css" %}" rel="stylesheet" type="text/css">
+    <link href="{% static "css/cali.css" %}" rel="stylesheet" type="text/css">
+
+    <!-- VueJs -->
+    <script src="https://unpkg.com/vue@2.5.13/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.5"></script>
+  </head>
+
+  <body>
+  <div id="search_engine">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand" href="/">Search Engine powered by CaLi</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          Menu
+          <i class="fa fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="#" id="dropdownSearch" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Search</a>
+              <div class="dropdown-menu" aria-labelledby="dropdownSearch">
+                <a class="dropdown-item" href="/ld/">Linked Data</a>
+                <a class="dropdown-item" href="/rep/">Repositories</a>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="#" id="dropdownGraph" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Graph</a>
+              <div class="dropdown-menu" aria-labelledby="dropdownGraph">
+                <a class="dropdown-item" href="/ld/graph">Linked Data</a>
+                <a class="dropdown-item" href="/rep/graph">Repositories</a>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/about">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/api">API</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="masthead" style="height: 280px; background-image: url({% static "img/home-bg.jpg"  %})">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 mx-auto">
+            <div class="site-heading">
+                <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-4 col-md-4" data-toggle="tooltip" data-placement="bottom" title="Use space to separate keywords">
+                  <input class="form-control" v-model="query" id="search_form" placeholder="Enter keywords to find repositories">
+                </div>
+                <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-3 col-md-3" data-toggle="tooltip" data-placement="bottom" title="Compatible: find less restrictive; Compliant: find more restrictive">
+                  <select v-model="selected_sens" id="sens_selection" class="custom-select mr-sm-2">
+                    <option value="compatible" selected>compatible with</option>
+                    <option value="compliant">compliant to</option>
+                  </select>
+                </div>
+                {% verbatim %}
+                <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-2 col-md-2">
+                  <select v-model="selected_license" id="license_selection" class="custom-select mr-sm-2">
+                    <option value="">License</option>
+                    <template v-for='license in licenses'>
+                      <option v-bind:value="license" v-for='label in license.labels'>{{ label }}</option>
+                    </template>
+                  </select>
+                </div>
+                <div style="padding: 0px 0px 0px 0px;" class="d-inline-block col-lg-2 col-md-2">
+                  <a v-on:click="search()" style="padding: 9px 10px;" class="btn btn-primary" href="#">Search &rarr;</a>
+                </div>
+                {% endverbatim %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+      <div class="row">
+          {% verbatim %}
+          <div v-show="selected_license_label" class="card bg-light mb-10 mx-auto text-center">
+          <div class="card-header">{{ selected_license_label }}</div>
+          <div class="card-body">
+            <div class="d-inline-block card text-white bg-success mb-10">
+              <div class="card-header">Permissions</div>
+              <div style="text-align: left!important;" class="card-body">
+                <ul class="list-group list-group-flush">
+                  <li v-for='permission in selected_license.permissions' style="padding: 0px 0px 0px 0px; background-color: transparent;" class="list-group-item">{{ permission }}</li>
+                </ul>
+              </div>
+            </div>
+            <div class="d-inline-block card text-white bg-danger mb-10">
+              <div class="card-header">Obligations</div>
+              <div style="text-align: left!important;" class="card-body">
+                <ul class="list-group list-group-flush">
+                  <li v-for='obligation in selected_license.obligations' style="padding: 0px 0px 0px 0px; background-color: transparent;" class="list-group-item">{{ obligation }}</li>
+                </ul>
+              </div>
+            </div>
+            <div class="d-inline-block card text-white bg-warning mb-10">
+              <div class="card-header">Prohibitions</div>
+              <div style="text-align: left!important;" class="card-body">
+                <ul class="list-group list-group-flush">
+                  <li v-for='prohibition in selected_license.prohibitions' style="padding: 0px 0px 0px 0px; background-color: transparent;" class="list-group-item">{{ prohibition }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endverbatim %}
+      </div>
+    </div>
+  </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-md-10 mx-auto">
+            <ul class="list-inline text-center">
+              <li class="list-inline-item">
+                <a href="https://github.com/benjimor/CaLi">
+                  <span class="fa-stack fa-lg">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+            </ul>
+            <p class="copyright text-muted">This service does not provide legal advice.</p>
+            <p class="copyright text-muted">This site is under MIT license</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="{% static "vendor/jquery/jquery.min.js" %}"></script>
+    <script src="{% static "vendor/bootstrap/js/bootstrap.bundle.min.js" %}"></script>
+
+    <!-- Custom scripts for this template -->
+    <script src="{% static "js/clean-blog.min.js" %}"></script>
+    <!-- Custom scripts -->
+    <script>
+    function get_path_graph(){
+      return 'rep';
+    }
+    </script>
+    <script src="{% static "js/engine.js" %}"></script>
+  </body>
+
+</html>

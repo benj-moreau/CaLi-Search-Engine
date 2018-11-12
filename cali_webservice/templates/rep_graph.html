@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="A license compliant search engine powered by CaLi">
+    <meta name="author" content="Benjamin MOREAU">
+
+    <title>License Compliant Search Engine</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "vendor/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" type="text/css">
+
+    <!-- Custom fonts for this template -->
+    <link href="{% static "vendor/font-awesome/css/font-awesome.min.css" %}" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- cali style -->
+    <link href="{% static "css/cali.css" %}" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="{% static "css/clean-blog.min.css" %}" rel="stylesheet" type="text/css">
+
+    <!-- VueJs -->
+    <script src="https://unpkg.com/vue@2.5.13/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.5"></script>
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand" href="/">Search Engine powered by CaLi</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          Menu
+          <i class="fa fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="#" id="dropdownSearch" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Search</a>
+              <div class="dropdown-menu" aria-labelledby="dropdownSearch">
+                <a class="dropdown-item" href="/ld/">Linked Data</a>
+                <a class="dropdown-item" href="/rep/">Repositories</a>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="#" id="dropdownGraph" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Graph</a>
+              <div class="dropdown-menu" aria-labelledby="dropdownGraph">
+                <a class="dropdown-item" href="/ld/graph">Linked Data</a>
+                <a class="dropdown-item" href="/rep/graph">Repositories</a>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/about">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/api">API</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="masthead" style="height: 150px; background-image: url({% static "img/home-bg.jpg"  %})">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-md-10 mx-auto">
+            <div style="padding: 80px 0 0px" class="site-heading">
+              <h1>CaLi Graph for Repositories</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container" id="graph">
+      <svg id="chart" width="1100" height="450"
+      viewBox="-825 -260 1650 675" style="border: 2px dotted #286893; border-radius: 20px;">
+      </svg>
+    </div>
+    <div class="legend" style="display: flex; justify-content: center; height: 25px">
+      <div class="align-middle bg-sized" style="width: 57.5px; height: 17px; background-image: url({% static "img/compatible.jpg"  %}); margin-top: auto; margin-bottom: auto;"></div>
+      <p class="copyright text-muted" style="font-size: 15px; margin-top: auto; margin-bottom: auto;">: <span style="font-style: italic;">"Compatible with"</span> relation</p>
+      <div class="align-middle bg-sized" style="width: 24.5px; height: 24.5px; background-image: url({% static "img/license.jpg"  %}); margin-top: auto; margin-bottom: auto; margin-left: 15px"></div>
+      <p class="copyright text-muted" style="font-size: 15px; margin-top: auto; margin-bottom: auto;">: License</p>
+    </div>
+    <div class="legend" style="display: flex; justify-content: center; height: 22px">
+      <div class="align-middle bg-sized" style="width: 22.3px; height: 16px; background-image: url({% static "img/association.jpg"  %}); margin-top: auto; margin-bottom: auto;"></div>
+      <p class="copyright text-muted" style="font-size: 15px; margin-top: auto; margin-bottom: auto;">: License/Resources association</p>
+      <div class="align-middle bg-sized" style="width: 9px; height: 9px; background-image: url({% static "img/dataset.jpg"  %}); margin-top: auto; margin-bottom: auto; margin-left: 15px"></div>
+      <p class="copyright text-muted" style="font-size: 15px; margin-top: auto; margin-bottom: auto;">: Resources</p>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-md-10 mx-auto">
+            <ul class="list-inline text-center">
+              <li class="list-inline-item">
+                <a href="https://github.com/benjimor/CaLi">
+                  <span class="fa-stack fa-lg">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+            </ul>
+            <p class="copyright text-muted">This service does not provide legal advice.</p>
+            <p class="copyright text-muted">This site is under MIT license</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="{% static "vendor/jquery/jquery.min.js" %}"></script>
+    <script src="{% static "vendor/bootstrap/js/bootstrap.bundle.min.js" %}"></script>
+    <!-- d3js for the graph -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <!-- Custom scripts for this template -->
+    <script src="{% static "js/clean-blog.min.js" %}"></script>
+    <!-- Custom scripts -->
+    <script>
+    function get_path_graph(){
+      return 'rep';
+    }
+    </script>
+    <script src="{% static "js/graph.js" %}"></script>
+  </body>
+
+</html>
