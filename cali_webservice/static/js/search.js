@@ -7,7 +7,13 @@ var search_results = new Vue({
     results: get_results(),
     nb_datasets: get_nb_datasets(),
     show_sets: false,
+    classification: get_classification()
   },
+  methods: {
+    export_link: function (format) {
+      return "../api/" + this.classification + "/exports/" + format;
+    }
+  }
 });
 
 function draw_graph(graph) {

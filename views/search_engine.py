@@ -72,7 +72,7 @@ def ld_search(request):
                 nodes.append(D3jsData.license_node(compatible_license_object))
                 added_nodes.append(compatible_license_object)
             links.append(D3jsData.compatible_link(license_object, compatible_license_object))
-    return render(request, 'search.html', {'results': json.dumps(results), 'nb_datasets': nb_datasets(results), 'graph': json.dumps(D3jsData.graph(nodes, links))})
+    return render(request, 'search.html', {'results': json.dumps(results), 'nb_datasets': nb_datasets(results), 'graph': json.dumps(D3jsData.graph(nodes, links)), 'classification': graph})
 
 
 @require_http_methods(['GET'])
@@ -109,7 +109,7 @@ def rep_search(request):
                 nodes.append(D3jsData.license_node(compatible_license_object))
                 added_nodes.append(compatible_license_object)
             links.append(D3jsData.compatible_link(license_object, compatible_license_object))
-    return render(request, 'search.html', {'results': json.dumps(results), 'nb_datasets': nb_datasets(results), 'graph': json.dumps(D3jsData.graph(nodes, links))})
+    return render(request, 'search.html', {'results': json.dumps(results), 'nb_datasets': nb_datasets(results), 'graph': json.dumps(D3jsData.graph(nodes, links)), 'classification': graph})
 
 
 def query_filter(license_object, keywords):

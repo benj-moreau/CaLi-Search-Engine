@@ -139,9 +139,20 @@
       <div class="col-lg-7 col-md-9">
       </div>
       <div class="col-lg-5 col-md-3">
-        <svg id="chart"
-        viewBox="-500 -260 1050 675" style="border: 2px dotted #286893; border-radius: 20px; background: white">
-        </svg>
+        <div class="row justify-content-between">
+          <h2>CaLi Graph</h2>
+          <button class="btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download" style="font-size: 20px"></i></button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" v-bind:href="export_link('turtle')" target="_blank">turtle</a>
+            <a class="dropdown-item" v-bind:href="export_link('n3')" target="_blank">n3</a>
+            <a class="dropdown-item" v-bind:href="export_link('nt')" target="_blank">nt</a>
+            <a class="dropdown-item" v-bind:href="export_link('xml')" target="_blank">xml</a>
+            <a class="dropdown-item" v-bind:href="export_link('json-ld')" target="_blank">json-ld</a>
+          </div>
+        </div>
+          <svg id="chart"
+          viewBox="-500 -260 1050 675" style="border: 2px dotted #286893; border-radius: 20px; background: white">
+          </svg>
       </div>
     </div>
   </div>
@@ -182,17 +193,19 @@
     <script>
     function get_results() {
       return JSON.parse('{{ results | escapejs }}');
-    }
-    </script>
-    <script>
+    };
+
     function get_nb_datasets() {
       return "{{ nb_datasets }}";
-    }
-    </script>
-    <script>
+    };
+
+    function get_classification() {
+      return "{{ classification }}";
+    };
+
     function get_graph() {
       return JSON.parse('{{ graph | escapejs }}');
-    }
+    };
     </script>
     <script src="{% static "js/search.js" %}"></script>
   </body>

@@ -83,6 +83,16 @@
 
     <!-- Main Content -->
     <div class="container" id="graph">
+      <div class="row justify-content-end">
+        <button class="btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-download" style="font-size: 20px"></i></button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" v-bind:href="export_link('turtle')" target="_blank">turtle</a>
+          <a class="dropdown-item" v-bind:href="export_link('n3')" target="_blank">n3</a>
+          <a class="dropdown-item" v-bind:href="export_link('nt')" target="_blank">nt</a>
+          <a class="dropdown-item" v-bind:href="export_link('xml')" target="_blank">xml</a>
+          <a class="dropdown-item" v-bind:href="export_link('json-ld')" target="_blank">json-ld</a>
+        </div>
+      </div>
       <svg id="chart" width="1100" height="450"
       viewBox="-825 -260 1650 675" style="border: 2px dotted #286893; border-radius: 20px;">
       </svg>

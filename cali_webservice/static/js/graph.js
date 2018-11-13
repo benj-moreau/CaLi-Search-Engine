@@ -13,6 +13,9 @@ var graph = new Vue({
         draw_graph(json_graph);
       });
     },
+    export_link: function (format) {
+      return "../api/" + get_path_graph() + "/exports/" + format;
+    }
   },
 });
 
