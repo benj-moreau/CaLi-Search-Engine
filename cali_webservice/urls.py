@@ -37,5 +37,6 @@ urlpatterns = [
     url(r'^rep/?$', search_engine.rep_engine, name='repengine'),
     url(r'^api/?$', search_engine.api, name='api'),
     url(r'^about/?$', search_engine.about, name='about'),
+    url(r'^publi/?$', search_engine.publi, name='publi'),
     url(r'', search_engine.about, name='index'),
 ]

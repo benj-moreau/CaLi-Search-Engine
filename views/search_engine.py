@@ -39,6 +39,11 @@ def about(request):
 
 
 @require_http_methods(['GET'])
+def publi(request):
+    return render(request, 'publi.html')
+
+
+@require_http_methods(['GET'])
 def ld_search(request):
     graph = 'ld'
     query = request.GET.get('query', '')
