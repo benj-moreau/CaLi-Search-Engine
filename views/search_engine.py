@@ -68,10 +68,11 @@ def ld_search(request):
             links.append(D3jsData.dataset_link(license_object, dataset_object))
         for compatible_neo_license in neo_license.followings.all():
             compatible_license_object = ObjectFactory.objectLicense(compatible_neo_license)
-            if compatible_license_object not in added_nodes:
+            if compatible_license_object not in added_nodes and compatible_neo_license in neo_licenses:
                 nodes.append(D3jsData.license_node(compatible_license_object))
                 added_nodes.append(compatible_license_object)
-            links.append(D3jsData.compatible_link(license_object, compatible_license_object))
+            if compatible_neo_license in neo_licenses:
+                links.append(D3jsData.compatible_link(license_object, compatible_license_object))
     return render(request, 'search.html', {'results': json.dumps(results), 'nb_datasets': nb_datasets(results), 'graph': json.dumps(D3jsData.graph(nodes, links)), 'classification': graph})
 
 
@@ -105,10 +106,11 @@ def rep_search(request):
             links.append(D3jsData.dataset_link(license_object, dataset_object))
         for compatible_neo_license in neo_license.followings.all():
             compatible_license_object = ObjectFactory.objectLicense(compatible_neo_license)
-            if compatible_license_object not in added_nodes:
+            if compatible_license_object not in added_nodes and compatible_neo_license in neo_licenses:
                 nodes.append(D3jsData.license_node(compatible_license_object))
                 added_nodes.append(compatible_license_object)
-            links.append(D3jsData.compatible_link(license_object, compatible_license_object))
+            if compatible_neo_license in neo_licenses:
+                links.append(D3jsData.compatible_link(license_object, compatible_license_object))
     return render(request, 'search.html', {'results': json.dumps(results), 'nb_datasets': nb_datasets(results), 'graph': json.dumps(D3jsData.graph(nodes, links)), 'classification': graph})
 
 
