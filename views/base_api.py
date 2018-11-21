@@ -319,32 +319,39 @@ def add_license_experiment(request):
 def add_license(request, graph):
     json_licenses = json.loads(request.body)
     added_licenses = []
-    random.shuffle(json_licenses)
+    # random.shuffle(json_licenses)
     license_levels = []
-    level_median = 0
+    # level_median = 0
+    '''
     try:
         with open(LEVELS_FILE, 'r') as f:
             license_levels = json.load(f)
     except IOError:
         pass
+    '''
     for json_license in json_licenses:
         object_license = License()
         object_license.from_json(json_license)
         if object_license.contains_only_odrl_actions():
             if Constraints.is_license_viable(object_license):
+                object_license, nb_visit = add_license_to_db(object_license, method='infimum', license_levels=license_levels, graph=graph)
+                '''
                 if license_levels:
                     level_median = median(license_levels)
                 if object_license.get_level() > level_median:
                     object_license, nb_visit = add_license_to_db(object_license, method='supremum', license_levels=license_levels, graph=graph)
                 else:
                     object_license, nb_visit = add_license_to_db(object_license, method='infimum', license_levels=license_levels, graph=graph)
+                '''
                 added_licenses.append(object_license.to_json())
             else:
                 added_licenses.append("Not a valid license: License is non-viable")
         else:
             added_licenses.append("Not a valid license: Use only ODRL actions")
+    '''
     with open(LEVELS_FILE, 'w') as outfile:
         json.dump(license_levels, outfile)
+    '''
     response = HttpResponse(
         json.dumps(added_licenses),
         content_type='application/json',
