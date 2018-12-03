@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^api/(?P<graph>[\w_@-]+)/resources/(?P<hashed_uri>[\w_@-]+)/?$', base_api.get_dataset_by_hash, name='get_dataset_by_hash'),
     url(r'^api/(?P<graph>[\w_@-]+)/exports/(?P<serialization_format>[\w_@-]+)/?$', base_api.export_licenses, name='export_licenses'),
     url(r'^api/(?P<graph>[\w_@-]+)/resources/?$', base_api.dataset_path, name='dataset_path'),
+    url(r'^api/licenses/experiment/algo?$', base_api.quadratic_experiment, name='quadratic_experiment'),
     url(r'^api/licenses/experiment/?$', base_api.add_license_experiment, name='experiment'),
     url(r'^ld/graph/?$', search_engine.ld_graph, name='ldgraph'),
     url(r'^ld/search?$', search_engine.ld_search, name='ldsearch'),

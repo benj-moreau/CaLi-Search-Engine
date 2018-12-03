@@ -7,6 +7,8 @@ from copy import deepcopy
 import json
 import random
 import time
+import csv
+import multiprocessing
 
 from objectmodels.Dataset import Dataset
 from objectmodels.License import License
@@ -313,6 +315,60 @@ def add_license_experiment(request):
     )
     response['Access-Control-Allow-Origin'] = '*'
     return response
+
+
+@require_http_methods(['GET'])
+@need_auth
+@fn_timer
+def quadratic_experiment(request):
+    LOGGER.info("begin quadratic experiment")
+    nb_exec = int(request.GET.get('executions', '1'))
+    step = int(request.GET.get('step', '100'))
+    # We do not check viability
+    # Add from the bottom
+    licenses = LicenseGenerator.generate('lattice')
+    fieldnames = ['nb_nodes', 'nb_visits', 'time']
+    for ex in range(0, nb_exec):
+        with open('expermiental_results/quadratic_exec{}.csv'.format(ex), 'w+') as csvfile:
+            csv.DictWriter(csvfile, fieldnames=fieldnames).writeheader()
+    jobs = []
+    lattice = Lattice(ODRL.ACTIONS)
+    for nb_licenses in xrange(0, len(licenses), step):
+        for ex in range(0, nb_exec):
+            LOGGER.info("begin quadratic experiment [{} random licenses/exec {}]".format(nb_licenses, ex))
+            p = multiprocessing.Process(target=experiment_process, args=(nb_licenses, licenses, ex, fieldnames, deepcopy(lattice),))
+            jobs.append(p)
+            p.start()
+    response = HttpResponse(
+        content_type='application/json',
+        status=201,
+    )
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+def experiment_process(nb_licenses, licenses, ex, fieldnames, lattice):
+    random_licenses = random.sample(licenses, nb_licenses)
+    lattice = Lattice(ODRL.ACTIONS)
+    license_levels = []
+    level_median = 0
+    nb_visits = 0
+    t0 = time.time()
+    for object_license in random_licenses:
+        license_level = object_license.get_level()
+        if license_levels:
+            level_median = median(license_levels)
+        if license_level > level_median:
+            nb_visit = add_license_to_lattice(object_license, lattice, method='supremum', license_levels=license_levels)
+        else:
+            nb_visit = add_license_to_lattice(object_license, lattice, method='infimum', license_levels=license_levels)
+        nb_visits += nb_visit
+    t1 = time.time()
+    total_time = t1-t0
+    lattice = Lattice(ODRL.ACTIONS)
+    with open('expermiental_results/quadratic_exec{}.csv'.format(ex), 'a+') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writerow({'nb_nodes': nb_licenses, 'nb_visits': nb_visits, 'time': total_time})
 
 
 @need_auth
