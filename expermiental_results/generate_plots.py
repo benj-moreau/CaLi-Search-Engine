@@ -39,6 +39,7 @@ def _aggregate(value, aggregate):
     return returned_value
 
 
+# Generation of a complete lattice of 2186 licenses
 def generate_exp2():
     plt.subplot(1, 1, 1)
     med = get_column(6, 'expermiental_results/lattice-rand-144-nb_visited-x1-agg50.csv')
@@ -51,6 +52,7 @@ def generate_exp2():
     plt.savefig('expermiental_results/exp2.png')
 
 
+# 144 licenses -> Linear order -> ASC, DESC and RANDOM
 def generate_exp1():
     plt.subplot(3, 1, 1)
     inf = get_column(2, 'expermiental_results/linear_order-asc-144-nb_visited-x1-agg1.csv')
@@ -85,5 +87,53 @@ def generate_exp1():
     plt.savefig('expermiental_results/exp1.png')
 
 
-generate_exp1()
-generate_exp2()
+# Order a set of n licenses taken from the lattice of 2186 licenses
+# Average of number of comparison on 3 execution
+def generate_exp3():
+    plt.figure(figsize=(8.0, 4.0), dpi=900)
+    x = get_column(0, 'expermiental_results/quadratic_exec0.csv')
+    y1 = get_column(1, 'expermiental_results/quadratic_exec0.csv')
+    y2 = get_column(1, 'expermiental_results/quadratic_exec1.csv')
+    y3 = get_column(1, 'expermiental_results/quadratic_exec2.csv')
+    y_quad = []
+    x = map(int, x)
+    for xi in map(int, x):
+        y_quad.append((xi*xi)/2)
+    y = np.mean(np.array([map(int, y1), map(int, y2), map(int, y3)]), axis=0)
+    plt.plot(x, y, linewidth=2, color='blue', label='Insertion sort algorithm')
+    plt.plot(x, y_quad, 'r--', linewidth=2, color='red', label="Upper bound: $n^{2}/2$")
+    plt.ylabel('Average number of comparisons')
+    plt.xlabel('Size of graphes')
+    plt.grid()
+    plt.xlim(100, 2100)
+    plt.legend(bbox_to_anchor=(0.75, 1.06))
+    plt.tight_layout()
+    plt.savefig('expermiental_results/exp3.png')
+    plt.yscale('log')
+    plt.xscale('log')
+    plt.savefig('expermiental_results/exp3_log.png')
+
+
+# Order a set of n licenses taken from the lattice of 2186 licenses
+# Average time to generate the lattice on 3 execution
+def generate_exp4():
+    plt.figure(figsize=(8.0, 4.0), dpi=900)
+    x = get_column(0, 'expermiental_results/quadratic_exec0.csv')
+    y1_time = get_column(2, 'expermiental_results/quadratic_exec0.csv')
+    y2_time = get_column(2, 'expermiental_results/quadratic_exec1.csv')
+    y3_time = get_column(2, 'expermiental_results/quadratic_exec2.csv')
+    x = map(int, x)
+    y_time = np.mean(np.array([map(float, y1_time), map(float, y2_time), map(float, y3_time)]), axis=0)
+    plt.plot(x, y_time, linewidth=2, color='blue', label='Insertion sort algorithm')
+    plt.ylabel('Average time to order (s)')
+    plt.xlabel('Size of graphes')
+    plt.grid()
+    plt.tight_layout()
+    plt.xlim(100, 2100)
+    plt.savefig('expermiental_results/exp4.png')
+
+
+# generate_exp1()
+# generate_exp2()
+generate_exp3()
+generate_exp4()
