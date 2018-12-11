@@ -6,7 +6,7 @@ This prototype use the ODRL CaLi Classification based on the [ODRL set of action
 (actions can be either permitted, obliged, prohibited or not specified (i.e., undefined). In this deontic lattice, the undefined status is the least restrictive and the prohibited one the most restrictive.)
 
 To use our search engine, go to the [CaLi online demonstrator](http://cali.priloo.univ-nantes.fr/) or [Install a local version](#Prelude).
-You can run our experiments on your local version (see [Execute experiment](#Execute experiment))
+You can run our experiments on your local version (see [Execute experiment](#execute-experiment))
 
 # Prelude
 Installation in a `virtualenv` is recommended.
