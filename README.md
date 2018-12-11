@@ -1,18 +1,25 @@
-# CaLi
+#CaLi
 CaLi is a lattice base model for license classifications. This repository contains the prototype of a search engine based on a CaLi classification that allows to find resources of the Web whose licenses are compatible or compliant with a target license.
 
-# Prelude
+This prototype use the ODRL CaLi Classification based on the [ODRL set of actions](https://www.w3.org/TR/odrl-vocab/#actionConcepts) and the following Deontic Lattice:
+`Undefined -> Permissions -> Duty -> Prohibition`
+(actions can be either permitted, obliged, prohibited or not specified (i.e., undefined). In this deontic lattice, the undefined status is the least restrictive and the prohibited one the most restrictive.)
+
+To use our search engine, go to the [CaLi online demonstrator](http://cali.priloo.univ-nantes.fr/) or [Install a local version](#Prelude).
+You can run our experiments on your local version (see [Execute experiment](#Execute experiment))
+
+#Prelude
 Installation in a `virtualenv` is recommended.
 
 Assuming you already have `python` and `pip`
 
-## Neo4j
+##Neo4j
 Install neo4j (recommended version: community-3.4.0)
 
 [Set an initial password](https://neo4j.com/docs/operations-manual/current/configuration/set-initial-password/) for neo4j.
 
-## Configure CaLi
-Create `/cali_webservice/local_settings.py` like this one ():
+##Configure CaLi
+Create `/cali_webservice/local_settings.py` like this one:
 ```python
 NEOMODEL_NEO4J_BOLT_URL = 'bolt://user:password@127.0.0.1:7687'
 HASHED_ADMIN_PASSWORD = '********************'
@@ -23,14 +30,14 @@ HASHED_ADMIN_PASSWORD should be a SHA256 hashed password.
 Hash your custom password [Here](https://passwordsgenerator.net/sha256-hash-generator/). It will be used to access admin api of CaLi.
 Django SECRET_KEY can be generated [Here](https://www.miniwebtool.com/django-secret-key-generator/)
 
-## Dependencies
+##Dependencies
 Then, install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-# Run the server
+#Run the server
 Navigate to cali folder and execute:
 
 ```bash
@@ -38,13 +45,13 @@ python manage.py runserver
 ```
 CaLi WebApp is accessible at: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
-## In case of errors
+##In case of errors
 
 CaLi uses the bolt connector to communicate with Neo4j.
 
 If connection is not working, check bolt configuration in Neo4j directory in file `conf/neo4j.conf` and update `/cali_webservice/local_settings.py`.
 
-# Build Creative Commons CaLi classification
+#Build Creative Commons CaLi classification
 
 To create a CaLi classification, Post an array of licenses objects at `http://127.0.0.1:8000/api/ld/licenses`.
 
@@ -197,7 +204,7 @@ Notice that graph is also available through Neo4j HTTP Browser at [http://localh
 
 You will be able to execute custom [Cypher queries](https://neo4j.com/docs/developer-manual/current/get-started/cypher/) on CaLi classification.
 
-## Search feature
+##Search feature
 With search feature, you can:
  - `Find resources whose licenses are compatible with a specific license`
  - `Find resources whose licenses are compliant with a specific license`
@@ -260,7 +267,8 @@ curl -X DELETE \
   -H 'Content-Type: application/json'
 ```
 
-# Execute experiment
+#Execute experiment
+
 Experiment api is available at `/api/licenses/experiment`. you can pass 2 HTTP parameters:
 
 | Parameter |          Values          | Description                     |
@@ -277,3 +285,13 @@ curl -X GET   'http://127.0.0.1:8000/api/licenses/experiment/?structure=lattice&
 ```
 
 Result is available in `experimental_results/` folder in `CSV` format file containing time and number of node to visit in order to classify each license using the three algorithms.
+
+##Experiment of the paper
+
+Experiment of the paper can be executed with the following HTTP request:
+
+```bash
+curl -X GET   'http://127.0.0.1:8000/api/licenses/experiment/algo?step=100&executions=3'   -H 'Admin-Password: YOUR_ADMIN_PASSWORD'
+```
+
+It evaluate our algorithm by ordering 20 subsets of licenses of different sizes from the CC_CaLi ordering. Size of subsets is incremented by 100 up to 2187 licenses. Here, Each subset is created and sorted 3 times randomly. Result contains average of the number of comparisons and time to sort each subset. Result is stored in `experimental_results/`.
