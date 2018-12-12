@@ -1,8 +1,8 @@
 # CaLi
-CaLi is a lattice base model for license classifications. This repository contains the prototype of a search engine based on a CaLi classification that allows to find resources of the Web whose licenses are compatible or compliant with a target license.
+CaLi is a lattice base model for license ordering. This repository contains the prototype of a search engine based on a CaLi ordering that allows to find resources of the Web whose licenses are compatible or compliant with a target license.
 
-This prototype uses the ODRL CaLi Classification based on the [ODRL set of actions](https://www.w3.org/TR/odrl-vocab/#actionConcepts) and the following Deontic Lattice:
-`Undefined -> Permissions -> Duty -> Prohibition`
+This prototype uses the ODRL CaLi ordering based on the [ODRL set of actions](https://www.w3.org/TR/odrl-vocab/#actionConcepts) and the following Deontic Lattice:
+`Undefined <= Permissions <= Duty <= Prohibition`
 (actions can be either permitted, obliged, prohibited or not specified (i.e., undefined). In this deontic lattice, the undefined status is the least restrictive and the prohibited one the most restrictive.)
 
 To use our search engine, go to the [CaLi online demonstrator](http://cali.priloo.univ-nantes.fr/) or [Install a local version](#Prelude).
