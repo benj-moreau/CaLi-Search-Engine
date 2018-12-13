@@ -1,14 +1,13 @@
-# CaLi
+# Introduction
 CaLi is a lattice base model for license ordering. This repository contains the prototype of a search engine based on a CaLi ordering that allows to find resources of the Web whose licenses are compatible or compliant with a target license.
 
 This prototype uses the ODRL CaLi ordering based on the [ODRL set of actions](https://www.w3.org/TR/odrl-vocab/#actionConcepts) and the following Deontic Lattice:
 `Undefined <= Permissions <= Duty <= Prohibition`
 (actions can be either permitted, obliged, prohibited or not specified (i.e., undefined). In this deontic lattice, the undefined status is the least restrictive and the prohibited one the most restrictive.)
 
-To use our search engine, go to the [CaLi online demonstrator](http://cali.priloo.univ-nantes.fr/) or [Install a local version](#Prelude).
-You can run our experiments on your local version (see [Execute experiment](#execute-experiment))
+To use our search engine, go to the [CaLi online demonstrator](http://cali.priloo.univ-nantes.fr/) or [Install a local version](#Installation) to run our experiments (see [Execute experiment](#execute-experiment))
 
-# Prelude
+# Installation
 Installation in a `virtualenv` is recommended.
 
 Assuming you already have `python` and `pip`
@@ -37,7 +36,7 @@ Then, install dependencies
 pip install -r requirements.txt
 ```
 
-# Run the server
+## Run the server
 Navigate to cali folder and execute:
 
 ```bash
@@ -45,13 +44,19 @@ python manage.py runserver
 ```
 CaLi WebApp is accessible at: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
+You can now try the [search engine](#search-engine) or [run experiments](#execute-experiment).
+
 ## In case of errors
 
 CaLi uses the bolt connector to communicate with Neo4j.
 
 If connection is not working, check bolt configuration in Neo4j directory in file `conf/neo4j.conf` and update `/cali_webservice/local_settings.py`.
 
-# Build Creative Commons CaLi classification
+# Search Engine
+
+An [online version of CaLi](http://cali.priloo.univ-nantes.fr/) is also available.
+
+## Build Creative Commons CaLi ordering
 
 To create a CaLi classification, Post an array of licenses objects at `http://127.0.0.1:8000/api/ld/licenses`.
 
@@ -255,7 +260,7 @@ Here is an example of licensed resources:
 
 Search will be available at [http://127.0.0.1:8000/ld/](http://127.0.0.1:8000/ld/)
 
-# Reset CaLi classification
+## Reset CaLi ordering
 
 To remove a classifications use the following HTTP request:
 
