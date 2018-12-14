@@ -79,7 +79,13 @@ curl -X POST \
   -H 'Content-Type: application/json' \
   -d '[
     {
-        "resources": [],
+        "resources": [
+          {
+            "label": "TAXREF-LD: Linked Data French Taxonomic Register",
+            "uri": "http://taxref.mnhn.fr/sparql",
+            "description": "TAXREF-LD is the Linked Data representation of TAXREF, the French national taxonomical register for fauna, flora and fungus, that covers mainland France and overseas territories. It accounts for over 500000 scientific names."
+			    }
+        ],
         "obligations": [
             "Notice",
             "Attribution"
@@ -137,7 +143,13 @@ curl -X POST \
         ]
     },
     {
-        "resources": [],
+        "resources": [
+          {
+            "label": "RDFLicense",
+            "uri": "http://purl.org/NET/rdflicense",
+            "description": "This dataset contains 126 licenses (suitable for general works, data, etc.) expressed as RDF.This work is the joint effort of OEG-UPM (Víctor Rodríguez-Doncel) and INRIA (Serena Villata). The editors have not acted in behalf of any of the license issuers, do not claim the legal value of this RDF-version of the licenses, and explicitly decline any responsibility in their use."
+			    }
+        ],
         "obligations": [
             "Notice",
             "Attribution"
@@ -193,7 +205,13 @@ curl -X POST \
         ]
     },
     {
-        "resources": [],
+        "resources": [
+          {
+            "label": "LOD-a-lot",
+            "uri": "http://lod-a-lot.lod.labs.vu.nl/LOD-a-lot",
+            "description": "A Queryable Dump of the LOD Cloud"
+          }
+        ],
         "obligations": [],
         "labels": [
             "CC-Ze"
@@ -216,6 +234,10 @@ Notice that graph is also available through Neo4j HTTP Browser at [http://localh
 
 You will be able to execute custom [Cypher queries](https://neo4j.com/docs/developer-manual/current/get-started/cypher/) on CaLi classification.
 
+## Build Linked Data and Souce Code Ordering
+
+Orderings of the online demonstrator can be build by executing `./linked_data_ordering.sh`for Linked Data and `./source_code_ordering.sh` for source code.
+
 ## Search feature
 With search feature, you can:
  - `Find resources whose licenses are compatible with a specific license`
@@ -223,49 +245,7 @@ With search feature, you can:
 
 Result is ordered by restrictiveness
 
-To enable search feature, add resources in `resources` keys of license objects.
-
-Here is an example of licensed resources:
-```json
-{
-        "permissions": [
-            "DerivativeWorks",
-            "Distribution",
-            "modify",
-            "Reproduction",
-            "CommericalUse"
-        ],
-        "obligations": [],
-        "labels": [
-            "CC-Ze"
-        ],
-        "prohibitions": [],
-        "resources": [
-            {
-                "description": "A Queryable Dump of the LOD Cloud",
-                "uri": "http://lod-a-lot.lod.labs.vu.nl/LOD-a-lot",
-                "label": "LOD-a-lot"
-            },
-            {
-                "description": "Enipedia is an active exploration into the applications of wikis and the semantic web for energy and industry issues. Through this we seek to create a collaborative environment for discussion, while also providing the tools that allow for data from different sources to be connected, queried, and visualized from different perspectives.",
-                "uri": "http://enipedia.tudelft.nl/sparql",
-                "label": "Enipedia - Energy Industry Data"
-            },
-            {
-                "description": "Conversion of various NASA datasets into RDF, starting with the spacecraft data from the NSSDC master catalog.",
-                "uri": "http://api.kasabi.com/dataset/nasa/apis/sparql",
-                "label": "NASA Space Flight & Astronaut data"
-            },
-            {
-                "description": "This data set maps the locations of crashes involving bikes in the Chapel Hill Region of North Carolina.",
-                "uri": "https://data.opendatasoft.com/explore/api/tpf/bicycle-crash-data-chapel-hill-region@townofchapelhill",
-                "label": "Bicycle Crashes"
-            }
-        ]
-    }
-```
-
-Search will be available at [http://127.0.0.1:8000/ld/](http://127.0.0.1:8000/ld/)
+Search is available at [http://127.0.0.1:8000/ld/](http://127.0.0.1:8000/ld/) for Linked Data and [http://127.0.0.1:8000/rep/](http://127.0.0.1:8000/rep/) for Source Code.
 
 ## Reset CaLi ordering
 
@@ -281,27 +261,9 @@ curl -X DELETE \
 
 # Execute experiment
 
-Experiment api is available at `/api/licenses/experiment`. you can pass 2 HTTP parameters:
-
-| Parameter |          Values          | Description                     |
-|-----------|:------------------------:|---------------------------------|
-| structure | `lattice` `linear_order` | structure of the set of license |
-| order     |    `rand` `asc` `desc`   | Restrictiveness order           |
-
-
-For example, the following experiment will classify all possible licenses of a vocabulary of 7 actions, in a random order using infimum, supremum and median algorithm.
-
-(Do not forget to replace YOUR_ADMIN_PASSWORD)
-```bash
-curl -X GET   'http://127.0.0.1:8000/api/licenses/experiment/?structure=lattice&order=rand'   -H 'Admin-Password: YOUR_ADMIN_PASSWORD'
-```
-
-Result is available in `experimental_results/` folder in `CSV` format file containing time and number of node to visit in order to classify each license using the three algorithms.
-
-## Experiment of the paper
-
 Experiment of the paper can be executed with the following HTTP request:
 
+(Only on local version ! Do not forget to replace YOUR_ADMIN_PASSWORD)
 ```bash
 curl -X GET   'http://127.0.0.1:8000/api/licenses/experiment/algo?step=100&executions=3'   -H 'Admin-Password: YOUR_ADMIN_PASSWORD'
 ```
