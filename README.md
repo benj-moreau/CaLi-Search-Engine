@@ -236,7 +236,7 @@ You will be able to execute custom [Cypher queries](https://neo4j.com/docs/devel
 
 ## Build Linked Data and Souce Code Ordering
 
-Orderings of the online demonstrator can be build by executing `./linked_data_ordering.sh`for Linked Data and `./source_code_ordering.sh` for source code.
+Orderings of the online demonstrator can be build by executing commands in `./linked_data_ordering.sh`for Linked Data and `./source_code_ordering.sh` for source code. (Do not forget to replace YOUR_ADMIN_PASSWORD).
 
 ## Search feature
 With search feature, you can:
