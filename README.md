@@ -1,10 +1,13 @@
 # Introduction
-CaLi is a lattice-based model for license orderings. This repository contains the source code of (1) the prototype of a search engine based on a CaLi ordering and (2) the experiments made for our research paper to analyse the algorithm we implemented to produce CaLi orderings.
+CaLi is a lattice-based model for license orderings. This repository contains the source code of 
+1. the prototype of a search engine based on a CaLi ordering and 
+2. the experiments made for our research paper to analyse the algorithm we implemented to produce CaLi orderings.
 
 Our code uses the ODRL CaLi ordering ⟨A, DL, CL, C→⟩ such that:
-– A is the set of 72 actions of ODRL (e.g., cc:Distribution, cc:ShareAlike), 
-– DL is the deontic lattice `Undefined <= Permissions <= Duty <= Prohibition` (actions can be either permitted, obliged, prohibited or not specified; in this deontic lattice, the undefined status is the least restrictive and the prohibited one the most restrictive),
-– CL and – C→ are sets of constraints.
+* A is the set of 72 actions of ODRL (e.g., cc:Distribution, cc:ShareAlike), 
+* DL is the deontic lattice `Undefined <= Permissions <= Duty <= Prohibition` (actions can be either permitted, obliged, prohibited or not specified; in this deontic lattice, the undefined status is the least restrictive and the prohibited one the most restrictive),
+* CL and
+* C→ are sets of constraints.
 
 If you simply want to see the usability of our apporach, see our online demonstrator [CaLi online demonstrator](http://cali.priloo.univ-nantes.fr/).
 
