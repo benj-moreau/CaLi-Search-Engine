@@ -1,11 +1,15 @@
 # Introduction
-CaLi is a lattice base model for license ordering. This repository contains the prototype of a search engine based on a CaLi ordering that allows to find resources of the Web whose licenses are compatible or compliant with a target license.
+CaLi is a lattice-based model for license orderings. This repository contains the source code of (1) the prototype of a search engine based on a CaLi ordering and (2) the experiments made for our research paper to analyse the algorithm we implemented to produce CaLi orderings.
 
-This prototype uses the ODRL CaLi ordering based on the [ODRL set of actions](https://www.w3.org/TR/odrl-vocab/#actionConcepts) and the following Deontic Lattice:
-`Undefined <= Permissions <= Duty <= Prohibition`
-(actions can be either permitted, obliged, prohibited or not specified (i.e., undefined). In this deontic lattice, the undefined status is the least restrictive and the prohibited one the most restrictive.)
+Our code uses the ODRL CaLi ordering ⟨A, DL, CL, C→⟩ such that:
+– A is the set of 72 actions of ODRL (e.g., cc:Distribution, cc:ShareAlike), 
+– DL is the deontic lattice `Undefined <= Permissions <= Duty <= Prohibition` (actions can be either permitted, obliged, prohibited or not specified; in this deontic lattice, the undefined status is the least restrictive and the prohibited one the most restrictive),
+– CL and – C→ are sets of constraints.
 
-To use our search engine, go to the [CaLi online demonstrator](http://cali.priloo.univ-nantes.fr/) or [Install a local version](#Installation) to run our experiments (see [Execute experiment](#execute-experiment))
+If you simply want to see the usability of our apporach, see our online demonstrator [CaLi online demonstrator](http://cali.priloo.univ-nantes.fr/).
+
+If you want to test our prototype or verify our experiments you should make a [Local installation](#Installation). Then, you can either build the prototype of our search engine (see [Search engine](#search-engine)) or execute our experiments (see [Execute experiment](#execute-experiment)).
+
 
 # Installation
 Installation in a `virtualenv` is recommended.
