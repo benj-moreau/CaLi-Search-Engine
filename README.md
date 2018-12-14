@@ -11,7 +11,7 @@ Our code uses the ODRL CaLi ordering ⟨A, DL, CL, C→⟩ such that:
 
 If you simply want to see the usability of our apporach, see our online demonstrator [CaLi online demonstrator](http://cali.priloo.univ-nantes.fr/).
 
-If you want to test our prototype or verify our experiments you should make a [Local installation](#Installation). Then, you can either build the prototype of our search engine (see [Search engine](#search-engine)) or execute our experiments (see [Execute experiment](#execute-experiment)).
+If you want to test our prototype or verify our experiments you should make a [local installation](#Installation). Then, you can either build the prototype of our search engine (see [Search engine](#search-engine)) or execute our experiments (see [Execute experiment](#execute-experiment)).
 
 
 # Installation
@@ -236,7 +236,7 @@ You will be able to execute custom [Cypher queries](https://neo4j.com/docs/devel
 
 ## Build Linked Data and Souce Code Ordering
 
-Orderings of the online demonstrator can be build by executing commands in `./linked_data_ordering.sh`for Linked Data and `./source_code_ordering.sh` for source code. (Do not forget to replace YOUR_ADMIN_PASSWORD).
+Orderings of the online demonstrator can be built by executing commands in `./linked_data_ordering.sh`for Linked Data and `./source_code_ordering.sh` for source code. (Do not forget to replace YOUR_ADMIN_PASSWORD).
 
 ## Search feature
 With search feature, you can:
@@ -261,11 +261,11 @@ curl -X DELETE \
 
 # Execute experiment
 
+We implemented an algorithm that can sort any set of n licenses using the DL see before in approximately n^2/2 comparisons. 
 Experiment of the paper can be executed with the following HTTP request:
 
 (Only on local version ! Do not forget to replace YOUR_ADMIN_PASSWORD)
 ```bash
 curl -X GET   'http://127.0.0.1:8000/api/licenses/experiment/algo?step=100&executions=3'   -H 'Admin-Password: YOUR_ADMIN_PASSWORD'
 ```
-
-It evaluate our algorithm by ordering 20 subsets of licenses of different sizes from the CC_CaLi ordering. Size of subsets is incremented by 100 up to 2187 licenses. Here, Each subset is created and sorted 3 times randomly. Result contains average of the number of comparisons and time to sort each subset. Result is stored in `experimental_results/`.
+We evaluate our algorithm by ordering 20 subsets of licenses of different sizes from the CC_CaLi ordering. Size of subsets is incremented by 100 up to 2187 licenses. Each subset is created and sorted 3 times randomly. Results contain the average of the number of comparisons and the time to sort each subset. Results are stored in `experimental_results/`.
