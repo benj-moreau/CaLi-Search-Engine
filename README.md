@@ -268,4 +268,4 @@ Experiment of the paper can be executed with the following HTTP request:
 ```bash
 curl -X GET   'http://127.0.0.1:8000/api/licenses/experiment/algo?step=100&executions=3'   -H 'Admin-Password: YOUR_ADMIN_PASSWORD'
 ```
-We evaluate our algorithm by ordering 20 subsets of licenses of different sizes from the CC_CaLi ordering. Size of subsets is incremented by 100 up to 2187 licenses. Each subset is created and sorted 3 times randomly. Results contain the average of the number of comparisons and the time to sort each subset. Results are stored in [results](https://github.com/benjimor/CaLi/tree/master/expermiental_results).
+We evaluate our algorithm by ordering 20 subsets of licenses of different sizes from the CC_CaLi ordering. Size of subsets is incremented by 100 up to 2187 licenses. Each subset is created and sorted 3 times randomly. Results contain the average of the number of comparisons and the time to sort each subset. Results are stored in [experimental_results/](https://github.com/benjimor/CaLi/tree/master/expermiental_results).
