@@ -272,7 +272,7 @@ We evaluate our algorithm by ordering 20 subsets of licenses of different sizes 
 
 # Algorithms
 
-![Median algorithm](algorithms/algo_median.png "Median algorithm")
+![Median algorithm](algorithms/algo_median.png "Median algorithm" | width=50)
 
 ![Add license](algorithms/add_license.png "Add license")
 
