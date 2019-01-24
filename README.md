@@ -1,10 +1,10 @@
 # Introduction
-CaLi is a lattice-based model for license orderings. This repository contains the source code of 
-1. the prototype of a search engine based on a CaLi ordering and 
+CaLi is a lattice-based model for license orderings. This repository contains the source code of
+1. the prototype of a search engine based on a CaLi ordering and
 2. the experiments made for our research paper to analyse the algorithm we implemented to produce CaLi orderings.
 
 Our code uses the ODRL CaLi ordering ⟨A, DL, CL, C→⟩ such that:
-* A is the set of 72 actions of ODRL (e.g., cc:Distribution, cc:ShareAlike), 
+* A is the set of 72 actions of ODRL (e.g., cc:Distribution, cc:ShareAlike),
 * DL is the deontic lattice `Undefined <= Permissions <= Duty <= Prohibition` (actions can be either permitted, obliged, prohibited or not specified; in this deontic lattice, the undefined status is the least restrictive and the prohibited one the most restrictive),
 * CL and
 * C→ are sets of constraints.
@@ -261,7 +261,7 @@ curl -X DELETE \
 
 # Execute experiment
 
-We implemented an algorithm that can sort any set of n licenses using the DL see before in approximately n^2/2 comparisons. 
+We implemented an algorithm that can sort any set of n licenses using the DL see before in approximately n^2/2 comparisons.
 Experiment of the paper can be executed with the following HTTP request:
 
 (Only on local version ! Do not forget to replace YOUR_ADMIN_PASSWORD)
@@ -269,3 +269,11 @@ Experiment of the paper can be executed with the following HTTP request:
 curl -X GET   'http://127.0.0.1:8000/api/licenses/experiment/algo?step=100&executions=3'   -H 'Admin-Password: YOUR_ADMIN_PASSWORD'
 ```
 We evaluate our algorithm by ordering 20 subsets of licenses of different sizes from the CC_CaLi ordering. Size of subsets is incremented by 100 up to 2187 licenses. Each subset is created and sorted 3 times randomly. Results contain the average of the number of comparisons and the time to sort each subset. Results are stored in [experimental_results/](expermiental_results/).
+
+# Algorithms
+
+![Median algorithm](algorithms/algo_median.png "Median algorithm")
+
+![Add license](algorithms/add_license.png "Add license")
+
+![Classify license](algorithms/classify_license.png "Classify license")
