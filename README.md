@@ -272,8 +272,8 @@ We evaluate our algorithm by ordering 20 subsets of licenses of different sizes 
 
 # Algorithms
 
-<img src="algorithms/algo_median.png" width="48">
+<img src="algorithms/algo_median.png" width="550">
 
-![Add license](algorithms/add_license.png "Add license")
+<img src="algorithms/add_license.png" width="550">
 
-![Classify license](algorithms/classify_license.png "Classify license")
+<img src="algorithms/classify_license.png" width="550">
