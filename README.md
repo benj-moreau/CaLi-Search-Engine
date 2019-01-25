@@ -275,21 +275,22 @@ We evaluate our algorithm by ordering 20 subsets of licenses of different sizes 
 The goal of the 3 algorithms is to be able to insert and classify a license in a CaLi ordering graph in linear time O(n).
 
 We use a heuristic, based on the restrictiveness of the new license (li), to chose between two strategies,
-- to insert a license traversing the graph from the greatest lower bound (Infimum I)
-- from the least upper bound (Supremum S).
+- to insert a license traversing the graph from the greatest lower bound (Infimum I),
+- to insert a license traversing the graph from the least upper bound (Supremum S).
+
 This heuristic reduce the average number of comparisons to insert a node.
 
-To do this, the following algorithm calculates the relative position of the new license (level_li) from the number of actions that it obliges and prohibits.
+To do this, Algorithm 1 calculates the relative position of the new license (level_li) from the number of actions that it obliges and prohibits.
 The median of levels (level_medianG) of the existing graph is calculated from the median of the number of prohibited and obliged actions of existing licenses in the graph G.
 Depending on these numbers, a strategy is chosen to find the place of the new license in the graph.
 
 <img src="algorithms/algo_median.png" width="600">
 
-The following algorithm add the license to the CaLi ordering Graph (G) and classify it starting from the least upper bound (Supremum S). This algorithm checks if the new license is valid using constraints on licenses (CL) defined in the CaLi Ordering.
+Algorithm 2 add the license to the CaLi ordering Graph (G) and classify it starting from the greatest lower bound (Infimum I). This algorithm checks if the new license is valid using constraints on licenses (CL) defined in the CaLi Ordering.
 
 <img src="algorithms/add_license.png" width="600">
 
-Next algorithm recursively classify the new license in the graph starting from the license (lj).
+Algorithm 3 recursively classify the new license in the graph starting from the license (lj).
 The goal is to find the first license compliant with the new license that is the least restrictive license compliant with the new license. This algorithm checks if the restrictive relation is also a compatible with relation using compatibility constraints of the CaLi ordering (C->) with is_compatible function.
 
 <img src="algorithms/classify_license.png" width="600">
