@@ -3,11 +3,11 @@ CaLi is a lattice-based model for license orderings. This repository contains th
 1. the prototype of a search engine based on a CaLi ordering and
 2. the experiments made for our research paper to analyse the algorithm we implemented to produce CaLi orderings.
 
-Our code uses the ODRL CaLi ordering ⟨A, DL, CL, C→⟩ such that:
+Our code uses the ODRL CaLi ordering ⟨A, DL, C<sub>L</sub>, C<sub>→</sub>⟩ such that:
 * A is the set of 72 actions of ODRL (e.g., cc:Distribution, cc:ShareAlike),
 * DL is the deontic lattice `Undefined <= Permissions <= Duty <= Prohibition` (actions can be either permitted, obliged, prohibited or not specified; in this deontic lattice, the undefined status is the least restrictive and the prohibited one the most restrictive),
-* CL and
-* C→ are sets of constraints.
+* C<sub>L</sub> and
+* C<sub>→</sub> are sets of constraints.
 
 If you simply want to see the usability of our apporach, see our online demonstrator [CaLi online demonstrator](http://cali.priloo.univ-nantes.fr/).
 
@@ -274,23 +274,23 @@ We evaluate our algorithm by ordering 20 subsets of licenses of different sizes 
 
 The goal of the next 3 algorithms is to insert and classify a license in a CaLi ordering graph in linear time O(n).
 
-We use a heuristic, based on the restrictiveness of the new license (li), to chose between two strategies, to insert a license traversing the graph
+We use a heuristic, based on the restrictiveness of the new license (l<sub>i</sub>), to chose between two strategies, to insert a license traversing the graph
 - from the greatest lower bound (Infimum I), or
 - from the least upper bound (Supremum S).
 
 This heuristic reduces the average number of comparisons to insert a node.
 
-To do this, Algorithm 1 calculates the relative position of the new license (level_li) from the number of actions that it obliges and prohibits.
-The median of levels (level_medianG) of the existing graph is calculated from the median of the number of prohibited and obliged actions of existing licenses in the graph G.
+To do this, Algorithm 1 calculates the relative position of the new license (level<sub>l<sub>i</sub></sub>) from the number of actions that it obliges and prohibits.
+The median of levels (level_median<sub>G</sub>) of the existing graph is calculated from the median of the number of prohibited and obliged actions of existing licenses in the graph G.
 Depending on these numbers, a strategy is chosen to find the place of the new license in the graph.
 
 <img src="algorithms/algo_median.png" width="600">
 
-Algorithm 2 adds the license to the CaLi ordering Graph (G) and inserts it starting from the greatest lower bound (Infimum I). This algorithm checks if the new license is valid using the constraints on licenses (CL) defined in the CaLi Ordering.
+Algorithm 2 adds the license to the CaLi ordering Graph (G) and inserts it starting from the greatest lower bound (Infimum I). This algorithm checks if the new license is valid using the constraints on licenses (C<sub>L</sub>) defined in the CaLi Ordering.
 
 <img src="algorithms/add_license.png" width="600">
 
-Algorithm 3 recursively classifies the new license in the graph starting from the license (lj).
-Its goal is to find the first license compliant with the new license that is the least restrictive license compliant with the new license. This algorithm checks if the restrictive relation is also a compatible with relation using compatibility constraints of the CaLi ordering (C->) with is_compatible function.
+Algorithm 3 recursively classifies the new license in the graph starting from the license (l<sub>j</sub>).
+Its goal is to find the first license compliant with the new license that is the least restrictive license compliant with the new license. This algorithm checks if the restrictive relation is also a compatible with relation using compatibility constraints of the CaLi ordering (C<sub>-></sub>) with is_compatible function.
 
 <img src="algorithms/classify_license.png" width="600">
