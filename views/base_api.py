@@ -1,9 +1,12 @@
 from django.http.response import HttpResponse
 from django.views.decorators.http import require_http_methods
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 from neomodel import UniqueProperty, DoesNotExist
 from numpy import median
 from copy import deepcopy
+from rdflib import URIRef, Literal
 import json
 import random
 import time
@@ -28,6 +31,8 @@ from utils import RDFExporter
 
 
 LEVELS_FILE = "license_levels.json"
+
+URL_VALIDATOR = URLValidator()
 
 
 @require_http_methods(['GET', 'POST', 'DELETE'])
@@ -775,3 +780,40 @@ def get_graph(request, graph):
         content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
+
+
+@require_http_methods(['GET', 'HEAD', 'OPTIONS'])
+def tpf_endpoint(request, graph):
+    page = int(request.GET.get('page', '1'))
+    subject = request.GET.get('subject')
+    subject = URIRef(subject) if subject else None
+    predicate = request.GET.get('predicate')
+    predicate = URIRef(predicate) if predicate else None
+    obj = request.GET.get('object')
+    obj = URIRef(obj) if obj else None
+    if obj is not None:
+        try:
+            URL_VALIDATOR(obj)
+            obj = URIRef(obj)
+        except ValidationError:
+            obj = _string_to_literal(obj)
+    fragment = RDFExporter.get_fragment(request, subject, predicate, obj, page, graph)
+    response = HttpResponse(
+        fragment.serialize(format="trig", encoding="utf-8"),
+        content_type='application/trig; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="twitter_tpf_fragment.trig"'
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Headers'] = 'Accept-Datetime,Accept'
+    return response
+
+
+def _string_to_literal(string):
+    splited_literal = string.split('"')
+    value = splited_literal[1]
+    datatype = splited_literal[2].split('^^')[1] if splited_literal[2] else None
+    try:
+        URL_VALIDATOR(datatype)
+        datatype = URIRef(datatype)
+    except ValidationError:
+        datatype = None
+    return Literal(value, datatype=datatype)

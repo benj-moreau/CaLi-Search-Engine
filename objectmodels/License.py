@@ -8,6 +8,7 @@ class License(object):
 
     def __init__(self):
         self.labels = []
+        self.licensing_terms = []
         self.permissions = frozenset()
         self.obligations = frozenset()
         self.prohibitions = frozenset()
@@ -42,6 +43,9 @@ class License(object):
     def get_labels(self):
         return self.labels
 
+    def get_licensing_terms(self):
+        return self.licensing_terms
+
     def get_permissions(self):
         return [str(permission) for permission in self.permissions]
 
@@ -66,6 +70,9 @@ class License(object):
     def set_labels(self, labels):
         self.labels = labels
 
+    def set_licensing_terms(self, licensing_terms):
+        self.licensing_terms = licensing_terms
+
     def set_permissions(self, permissions):
         if not isinstance(permissions, frozenset):
             raise TypeError("permissions must be of type: frozenset")
@@ -86,6 +93,7 @@ class License(object):
 
     def from_json(self, json_license):
         self.set_labels(json_license['labels'])
+        self.set_licensing_terms(json_license['licensing_terms'])
         self.set_permissions(frozenset(json_license['permissions']))
         self.set_obligations(frozenset(json_license['obligations']))
         self.set_prohibitions(frozenset(json_license['prohibitions']))
@@ -99,6 +107,7 @@ class License(object):
     def to_json(self):
         return {
             'labels': self.get_labels(),
+            'licensing_terms': self.get_licensing_terms(),
             'permissions': self.get_permissions(),
             'obligations': self.get_obligations(),
             'prohibitions': self.get_prohibitions(),

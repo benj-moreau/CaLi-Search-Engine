@@ -5,6 +5,7 @@ from neomodel import db
 # DAO. Objects used to access data in neo4j database
 class LicenseModel(StructuredNode):
     labels = ArrayProperty()
+    licensing_terms = ArrayProperty()
     permissions = ArrayProperty(index=True)
     obligations = ArrayProperty(index=True)
     prohibitions = ArrayProperty(index=True)
