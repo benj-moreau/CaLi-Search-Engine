@@ -85,6 +85,17 @@ var api_doc = new Vue({
                    {'name': '[format]', 'descr': 'rdf serialization format: \'n3\', \'nt\', \'xml\', \'turtle\', \'json-ld\''}],
         'descr': 'Export classification in RDF. Licenses are described using ODRL vocabulary'
       },
+      {
+        'method': 'GET',
+        'path': 'api/[classification]/tpf',
+        'params': [{'name': '[classification]', 'descr': 'classification \'ld\' or \'rep\''},
+                   {'name': 'subject', 'descr': 'The subject of the triple pattern query (URI)'},
+                   {'name': 'predicate', 'descr': 'The predicate of the triple pattern query (URI)'},
+                   {'name': 'object', 'descr': 'The object of the triple pattern query (URI or Term)'},
+                   {'name': 'page', 'descr': 'The page number of the result that will be returned (Integer)'},
+                  ],
+        'descr': 'Triple Pattern Fragments endpoint to query the graph. Use a TPF or Comunica client to execute SPARQL queries'
+      },
     ],
   },
 });

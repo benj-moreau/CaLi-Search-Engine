@@ -5,6 +5,7 @@ curl -X POST \
   -d '[
 	{
 		"labels": ["ODC-PDDL", "Public-domain", "CC-Ze"],
+		"licensing_terms": ["https://www.opendatacommons.org/licenses/pddl/1-0", "https://creativecommons.org/publicdomain/zero/1.0/legalcode"],
 	    "permissions": ["Distribution", "Reproduction", "CommericalUse", "DerivativeWorks", "modify"],
 	    "obligations": [],
 	    "prohibitions": [],
@@ -33,6 +34,7 @@ curl -X POST \
 	},
 	{
 		"labels": ["MIT"],
+		"licensing_terms": ["https://opensource.org/licenses/MIT"],
 	    "permissions": ["Distribution", "Reproduction", "CommericalUse", "DerivativeWorks", "modify"],
 	    "obligations": ["Notice"],
 	    "prohibitions": [],
@@ -46,6 +48,7 @@ curl -X POST \
 	},
 	{
 		"labels": ["CC BY", "ODC-By", "Etalab-ol-lo", "UK-open-government", "GPL3"],
+		"licensing_terms": ["https://creativecommons.org/licenses/by/3.0/legalcode", "https://opendatacommons.org/licenses/by/1-0/", "https://github.com/etalab/licence-ouverte/blob/master/open-licence.md", "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/", "https://www.gnu.org/licenses/gpl-3.0"],
 	    "permissions": ["Distribution", "Reproduction", "CommericalUse", "DerivativeWorks", "modify"],
 	    "obligations": ["Attribution", "Notice"],
 	    "prohibitions": [],
@@ -109,6 +112,7 @@ curl -X POST \
 	},
 	{
 		"labels": ["ODC-ODbL"],
+		"licensing_terms": ["https://opendatacommons.org/licenses/odbl/1.0"],
 	    "permissions": ["Distribution", "Reproduction", "CommericalUse", "DerivativeWorks", "modify"],
 	    "obligations": ["Attribution", "ShareAlike", "Notice"],
 	    "prohibitions": [],
@@ -132,6 +136,7 @@ curl -X POST \
 	},
 	{
 		"labels": ["CC BY-SA"],
+		"licensing_terms": ["https://creativecommons.org/licenses/by-sa/3.0/legalcode"],
 	    "permissions": ["Distribution", "Reproduction", "CommericalUse", "DerivativeWorks", "modify"],
 	    "obligations": ["Attribution", "Notice", "ShareAlike"],
 	    "prohibitions": [],
@@ -155,6 +160,7 @@ curl -X POST \
 	},
 	{
 		"labels": ["CC BY-NC"],
+		"licensing_terms": ["https://creativecommons.org/licenses/by-nc/3.0/legalcode"],
 	    "permissions": ["Distribution", "Reproduction", "DerivativeWorks", "modify"],
 	    "obligations": ["Attribution", "Notice"],
 	    "prohibitions": ["CommericalUse"],
@@ -178,6 +184,7 @@ curl -X POST \
 	},
 	{
 		"labels": ["CC BY-NC-SA"],
+		"licensing_terms": ["https://creativecommons.org/licenses/by-nc-sa/3.0/legalcode"],
 	    "permissions": ["Distribution", "Reproduction", "DerivativeWorks", "modify"],
 	    "obligations": ["Attribution", "Notice", "ShareAlike"],
 	    "prohibitions": ["CommericalUse"],
@@ -196,6 +203,7 @@ curl -X POST \
 	},
 	{
 		"labels": ["CC BY-NC-ND"],
+		"licensing_terms": ["https://creativecommons.org/licenses/by-nc-nd/3.0/legalcode"],
 	    "permissions": ["Distribution", "Reproduction"],
 	    "obligations": ["Attribution", "Notice"],
 	    "prohibitions": ["CommericalUse", "DerivativeWorks", "modify"],
@@ -224,6 +232,7 @@ curl -X POST \
 	},
 	{
 		"labels": ["GFDL"],
+		"licensing_terms": ["https://www.gnu.org/licenses/fdl"],
 	    "permissions": ["Distribution", "Reproduction", "CommericalUse", "DerivativeWorks", "modify"],
 	    "obligations": ["Attribution", "Notice", "ShareAlike"],
 	    "prohibitions": [],
