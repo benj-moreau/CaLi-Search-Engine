@@ -26,6 +26,7 @@ def get_rdf(licenses, graph):
     rdf_graph.bind("odrl", ODRL)
     rdf_graph.bind("odrs", ODRS)
     rdf_graph.bind('l4lod', L4LOD)
+    rdf_graph.bind('cc', CC)
     for license in licenses:
         subject = URIRef(LICENSE_SUBJECT.format(graph, license['hashed_sets']))
         rdf_graph.add((subject, RDF.type, ODRL['Policy']))
