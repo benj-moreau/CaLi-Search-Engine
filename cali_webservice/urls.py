@@ -26,5 +26,6 @@ urlpatterns = [
     url(r'^api/?$', search_engine.api, name='api'),
     url(r'^about/?$', search_engine.about, name='about'),
     url(r'^publi/?$', search_engine.publi, name='publi'),
+    url(r'^ontology/?$', base_api.get_cali_ontology, name='ontology'),
     url(r'', search_engine.about, name='index'),
 ]

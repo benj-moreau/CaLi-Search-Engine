@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from neomodel import UniqueProperty, DoesNotExist
 from numpy import median
 from copy import deepcopy
-from rdflib import URIRef, Literal
+from rdflib import URIRef, Literal, Graph
 import json
 import random
 import time
@@ -778,6 +778,16 @@ def get_graph(request, graph):
     response = HttpResponse(
         json.dumps(D3jsData.graph(nodes, links)),
         content_type='application/json')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+@require_http_methods(['GET'])
+def get_cali_ontology(request):
+    mapping = Graph().parse('./cali_webservice/templates/cali_ontology.ttl', format='ttl')
+    response = HttpResponse(
+        mapping.serialize(format='turtle'),
+        content_type='text/turtle; charset=utf-8')
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
