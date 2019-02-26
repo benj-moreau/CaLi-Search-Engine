@@ -9,6 +9,7 @@ LICENSE_SUBJECT_PREFIX = "http://cali.priloo.univ-nantes.fr/api/"
 
 ODRL = Namespace("http://www.w3.org/ns/odrl/2/")
 ODRS = Namespace("http://schema.theodi.org/odrs#")
+CC = Namespace("http://creativecommons.org/ns#")
 HYDRA = Namespace("http://www.w3.org/ns/hydra/core#")
 VOID = Namespace("http://rdfs.org/ns/void#")
 FOAF = Namespace("http://xmlns.com/foaf/0.1/")
@@ -37,11 +38,11 @@ def get_rdf(licenses, graph):
             except Exception:
                 pass
         for action in license.get('permissions'):
-            rdf_graph.add((subject, ODRL['permissions'], ODRL[action]))
+            rdf_graph.add((subject, ODRL['Permissions'], _get_uri(action)))
         for action in license.get('prohibitions'):
-            rdf_graph.add((subject, ODRL['prohibition'], ODRL[action]))
+            rdf_graph.add((subject, ODRL['Prohibition'], _get_uri(action)))
         for action in license.get('obligations'):
-            rdf_graph.add((subject, ODRL['duty'], ODRL[action]))
+            rdf_graph.add((subject, ODRL['Duty'], _get_uri(action)))
         for resource in license.get('resources'):
             subject_resource = URIRef(resource['uri'])
             rdf_graph.add((subject_resource, RDF.type, ODRL['Asset']))
@@ -81,6 +82,12 @@ def get_fragment(request, subject, predicate, obj, page, graph):
     nb_triple_per_page = total_nb_triples
     _frament_fill_meta(subject, predicate, obj, page, graph, fragment, last_result, total_nb_triples, nb_triple_per_page, request, tpf_url)
     return fragment
+
+
+def _get_uri(action):
+    if action in ['Attribution', 'CommericalUse', 'DerivativeWorks', 'Distribution', 'Notice', 'Reproduction', 'ShareAlike', 'Sharing', 'SourceCode']:
+        return CC[action]
+    return ODRL[action]
 
 
 def _frament_fill_meta(subject, predicate, obj, page, graph, fragment, last_result, total_nb_triples, nb_triple_per_page, request, tpf_url):
