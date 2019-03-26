@@ -39,7 +39,7 @@ def get_rdf(licenses, graph):
             except Exception:
                 pass
         for action in license.get('permissions'):
-            rdf_graph.add((subject, ODRL['Permissions'], _get_uri(action)))
+            rdf_graph.add((subject, ODRL['Permission'], _get_uri(action)))
         for action in license.get('prohibitions'):
             rdf_graph.add((subject, ODRL['Prohibition'], _get_uri(action)))
         for action in license.get('obligations'):
