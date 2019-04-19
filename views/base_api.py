@@ -180,7 +180,7 @@ def get_dataset_search(request, graph):
     uri = request.GET.get('uri', None)
     neo_datasets = DatasetModel.nodes.filter(graph__exact=graph)
     if query:
-        neo_datasets = dataset_filter_search(query)
+        neo_datasets = dataset_filter_search(query, graph)
     else:
         if label:
             neo_datasets = neo_datasets.filter(label__icontains=label)
@@ -753,6 +753,7 @@ def export_licenses(request, graph, serialization_format):
             license_object['compatible_licenses'].append(compatible_license.hash())
         licenses.append(license_object)
     rdf_licenses = RDFExporter.get_rdf(licenses, graph)
+    RDFExporter.add_meta_license(rdf_licenses, graph, request.build_absolute_uri())
     response = HttpResponse(
         rdf_licenses.serialize(format=serialization_format),
         content_type='text/{}'.format(serialization_format))

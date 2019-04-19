@@ -164,3 +164,18 @@ def _tpf_url(dataset_base, page, subject, predicate, obj):
         object_parameter = ''
     parameters = {'page': page, 'subject': subject_parameter, 'predicate': predicate_parameter, 'object': object_parameter}
     return URIRef("%s?%s" % (dataset_base, urlencode(parameters)))
+
+
+def add_meta_license(rdf_graph, graph, base_uri):
+    subject = URIRef(LICENSE_SUBJECT.format(graph, 'MIT'))
+    rdf_graph.add((subject, RDF.type, ODRL['Policy']))
+    rdf_graph.add((subject, RDFS.label, Literal('MIT')))
+    licensing_term = URIRef('https://opensource.org/licenses/MIT')
+    rdf_graph.add((subject, L4LOD['licensingTerms'], licensing_term))
+    rdf_graph.add((subject, ODRL['Permission'], _get_uri('Distribution')))
+    rdf_graph.add((subject, ODRL['Permission'], _get_uri('Reproduction')))
+    rdf_graph.add((subject, ODRL['Permission'], _get_uri('CommericalUse')))
+    rdf_graph.add((subject, ODRL['Permission'], _get_uri('DerivativeWorks')))
+    rdf_graph.add((subject, ODRL['Permission'], _get_uri('modify')))
+    rdf_graph.add((subject, ODRL['Duty'], _get_uri('Notice')))
+    rdf_graph.add((URIRef(base_uri), ODRL['hasPolicy'], subject))
